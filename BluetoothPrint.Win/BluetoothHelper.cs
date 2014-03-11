@@ -20,10 +20,9 @@ namespace BluetoothPrint
         private BluetoothClient blueClient;
         Dictionary<string, BluetoothAddress> deviceAddress = new Dictionary<string, BluetoothAddress>();
 
-        public bool Inite()
+        public void Inite()
         {
             blueClient = new BluetoothClient();
-            return true;
         }
 
 

@@ -45,9 +45,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SerialPortPrint\Pos.cs">
+      <Link>Pos.cs</Link>
+    </Compile>
     <Compile Include="BluetoothErrorEnum.cs" />
     <Compile Include="BluetoothHelper.cs" />
-    <Compile Include="Pos.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

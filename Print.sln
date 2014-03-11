@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.USBPrint.droid", "Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.SerialPortPrint", "Test.SerialPortPrint\Test.SerialPortPrint.csproj", "{95112FBF-ECE7-43BD-9329-BD04E31D75CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USBPrint.Win", "USBPrint.Win\USBPrint.Win.csproj", "{301D49C3-1FC1-4F8C-9361-CC104D5AE385}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{95112FBF-ECE7-43BD-9329-BD04E31D75CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95112FBF-ECE7-43BD-9329-BD04E31D75CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95112FBF-ECE7-43BD-9329-BD04E31D75CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{301D49C3-1FC1-4F8C-9361-CC104D5AE385}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{301D49C3-1FC1-4F8C-9361-CC104D5AE385}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{301D49C3-1FC1-4F8C-9361-CC104D5AE385}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{301D49C3-1FC1-4F8C-9361-CC104D5AE385}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
