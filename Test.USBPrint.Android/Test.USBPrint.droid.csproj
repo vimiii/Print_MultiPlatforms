@@ -72,11 +72,19 @@
     <AndroidResource Include="Resources\Drawable\Icon.png" />
   </ItemGroup>
   <ItemGroup>
+    <AndroidAsset Include="Assets\T.png" />
+    <AndroidAsset Include="Assets\tt.png" />
     <Content Include="Properties\AndroidManifest.xml" />
     <AndroidResource Include="Resources\Xml\device_filter.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="lib\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\USBPrint.droid\USBPrint.droid.csproj">
+      <Project>{f6c1aadb-03ed-4a20-ae52-b931bf294d98}</Project>
+      <Name>USBPrint.droid</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

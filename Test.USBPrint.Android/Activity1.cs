@@ -12,13 +12,14 @@ using System.Collections.Generic;
 using Java.Util;
 using Android.Util;
 using System.Text;
+using USBPrint.droid;
+using Android.Graphics;
 
 namespace Test.USBPrint.droid
 {
     [Activity(Label = "USBPrint", MainLauncher = true, Icon = "@drawable/icon")]
     public class Activity1 : Activity
     {
-        int count = 1;
         private UsbManager myUsbManager;   //USB管理器  
         private UsbDevice myUsbDevice;  //找到的USB设备  
         private UsbInterface myInterface;
@@ -26,7 +27,9 @@ namespace Test.USBPrint.droid
         private UsbEndpoint epIn;
         UsbDeviceConnection myDeviceConnection = null;
 
-        string TAG = "my";
+
+        PrintHelper helper;
+
 
         List<int> productList = new List<int>();
 
@@ -42,76 +45,57 @@ namespace Test.USBPrint.droid
             Button button = FindViewById<Button>(Resource.Id.MyButton);
 
             // 获取UsbManager
-            myUsbManager = (UsbManager)GetSystemService(UsbService);
+            //myUsbManager = (UsbManager)GetSystemService(UsbService);
 
-            enumerateDevice();
+            //enumerateDevice();
 
-            findInterface();
+            //findInterface();
 
-            openDevice();
+            //assignEndpoint();
 
-            assignEndpoint();
+            //openDevice();
 
+            helper = new PrintHelper();
+            int err = 0;
+            if (helper.Inite(this, 1659, 8965, out err))
+            {
+                helper.Open();
+            }
             //查找USB设备
             button.Click += (o, e) =>
             {
-                int ret = -100;
-                string mes = "1111111111";
-                byte[] Receiveytes;
-
-                byte[] OutBuffer;//数据
-                int BufferSize;
-                Encoding targetEncoding;
-
-                //将[UNICODE编码]转换为[GB码]，仅使用于简体中文版mobile
-                targetEncoding = Encoding.GetEncoding(0);    //得到简体中文字码页的编码方式，因为是简体中文操作系统，参数用0就可以，用936也行。
-                BufferSize = targetEncoding.GetByteCount(mes); //计算对指定字符数组中的所有字符进行编码所产生的字节数           
-                OutBuffer = new byte[BufferSize];
-                OutBuffer = targetEncoding.GetBytes(mes);
-                byte[] cmdData = new byte[BufferSize + 5];
-
-                //初始化打印机
-                cmdData[0] = 0x1B;
-                cmdData[1] = 0x40;
-                //设置字符顺时旋转180度
-                cmdData[2] = 0x1B;
-                cmdData[3] = 0x56;
-                cmdData[4] = 0;
-                for (int i = 0; i < BufferSize; i++)
-                {
-                    cmdData[5 + i] = OutBuffer[i];
-                }
-                //发送数据
-                sendPackage(cmdData);
+                string mess = "11111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654111111122234566789876543765476547656541111111222345667898765437654765476565411111112223456678987654376547654765654你好";
+                helper.PrintString(mess, out err);
+                Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("tt.png"));
+                //helper.PrintImg(bm, out err);
             };
         }
+        
 
-        private void getEndpoint(UsbDeviceConnection connection, UsbInterface intf)
-        {
-            if (intf.GetEndpoint(1) != null)
-            {
-                epOut = intf.GetEndpoint(1);
-            }
-            if (intf.GetEndpoint(0) != null)
-            {
-                epIn = intf.GetEndpoint(0);
-            }
-        }
         /**
     * 分配端点，IN | OUT，即输入输出；此处我直接用1为OUT端点，0为IN，当然你也可以通过判断
     */
         private void assignEndpoint()
         {
-            if (myInterface.GetEndpoint(1) != null)
+            try
             {
-                epOut = myInterface.GetEndpoint(1);
+                for (int i = 0; i < myInterface.EndpointCount; i++)
+                {
+                    UsbEndpoint point = myInterface.GetEndpoint(i);
+                    if (point.Type == UsbAddressing.Out)
+                    {
+                        epOut = point;
+                    }
+                    else
+                    {
+                        epIn = point;
+                    }
+                }
             }
-            if (myInterface.GetEndpoint(0) != null)
+            catch (Exception ex)
             {
-                epIn = myInterface.GetEndpoint(0);
+                throw ex;
             }
-
-            //Log.Debug(TAG, getString(R.string.text));
         }
 
         /**
@@ -136,7 +120,6 @@ namespace Test.USBPrint.droid
                 if (conn.ClaimInterface(myInterface, true))
                 {
                     myDeviceConnection = conn; // 到此你的android设备已经连上HID设备
-                    Log.Debug(TAG, "打开设备成功");
                 }
                 else
                 {
@@ -152,16 +135,15 @@ namespace Test.USBPrint.droid
         {
             if (myUsbDevice != null)
             {
-                /*
-                //Log.d(TAG, "interfaceCounts : " + myUsbDevice.InterfaceCount);
                 for (int i = 0; i < myUsbDevice.InterfaceCount; i++)
                 {
-                    
-                    break;
+                    UsbInterface intf = myUsbDevice.GetInterface(i);
+                    if (intf.EndpointCount >= 2)
+                    {
+                        myInterface = intf;
+                        break;
+                    }
                 }
-                */
-                UsbInterface intf = myUsbDevice.GetInterface(1);
-                myInterface = intf;
             }
         }
 
@@ -179,35 +161,22 @@ namespace Test.USBPrint.droid
             {
                 KeyValuePair<string, UsbDevice> kv = usbList.Current;
                 productList.Add(kv.Value.ProductId);
-                if (kv.Value.ProductId == 8965)
+                if (kv.Value.ProductId == 8965 && kv.Value.VendorId == 1659)
                 {
                     myUsbDevice = kv.Value;
                 }
             }
         }
-
+        /// <summary>
+        /// 发送数据包
+        /// </summary>
+        /// <param name="command"></param>
         private void sendPackage(byte[] command)
         {
             int ret = -100;
             int len = command.Length;
 
-            byte[] recive=new byte[20];
-
-            /*
-            // 组织准备命令
-            byte[] sendOut = Commands.OUT_S;
-            sendOut[8] = (byte)(len & 0xff);
-            sendOut[9] = (byte)((len >> 8) & 0xff);
-            sendOut[10] = (byte)((len >> 16) & 0xff);
-            sendOut[11] = (byte)((len >> 24) & 0xff);
-
-            // 1,发送准备命令
-            ret = myDeviceConnection.BulkTransfer(epOut, sendOut, 31, 10000);
-            if (ret != 31)
-            {
-                return;
-            }
-            */
+            byte[] recive = new byte[20];
             // 2,发送COM
             ret = myDeviceConnection.BulkTransfer(epOut, command, len, 10000);
             if (ret != len)
@@ -222,11 +191,6 @@ namespace Test.USBPrint.droid
                 return;
             }
         }
-
-
-
-
-
     }
 }
 

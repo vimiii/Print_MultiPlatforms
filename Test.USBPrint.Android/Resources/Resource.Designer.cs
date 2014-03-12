@@ -26,6 +26,8 @@ namespace Test.USBPrint.droid
 		
 		public static void UpdateIdValues()
 		{
+			global::USBPrint.droid.Resource.String.ApplicationName = global::Test.USBPrint.droid.Resource.String.ApplicationName;
+			global::USBPrint.droid.Resource.String.Hello = global::Test.USBPrint.droid.Resource.String.Hello;
 		}
 		
 		public partial class Attribute

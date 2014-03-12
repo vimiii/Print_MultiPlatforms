@@ -280,7 +280,7 @@ namespace BluetoothPrint.droid
 		/// </summary>
 		public void ConnectionLost ()
 		{
-			//SetState (STATE_LISTEN);
+			SetState (STATE_LISTEN);
 			
 			// Send a failure message back to the Activity
             var msg = _handler.ObtainMessage(BluetoothHelper.MESSAGE_TOAST);
