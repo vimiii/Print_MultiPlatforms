@@ -73,7 +73,7 @@ namespace Test.BluetoothPrint.droid
                 
                 
     
-                Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("T.png"));
+                Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("qq.png"));
        
                 blueH.SendImg(bm,out err);
             };
