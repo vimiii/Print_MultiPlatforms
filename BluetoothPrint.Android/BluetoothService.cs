@@ -199,6 +199,7 @@ namespace BluetoothPrint.droid
 			// Start the thread to manage the connection and perform transmissions
 			connectedThread = new ConnectedThread (socket, this);
 			connectedThread.Start ();
+            SetState(STATE_CONNECTED);
 	
 			// Send the name of the connected device back to the UI Activity
             var msg = _handler.ObtainMessage(BluetoothHelper.MESSAGE_DEVICE_NAME);
@@ -209,7 +210,7 @@ namespace BluetoothPrint.droid
 			msg.Data = bundle;
 			_handler.SendMessage (msg);
 	
-			SetState (STATE_CONNECTED);
+			
 		}
 		
 		/// <summary>
@@ -279,7 +280,7 @@ namespace BluetoothPrint.droid
 		/// </summary>
 		public void ConnectionLost ()
 		{
-			SetState (STATE_LISTEN);
+			//SetState (STATE_LISTEN);
 			
 			// Send a failure message back to the Activity
             var msg = _handler.ObtainMessage(BluetoothHelper.MESSAGE_TOAST);
