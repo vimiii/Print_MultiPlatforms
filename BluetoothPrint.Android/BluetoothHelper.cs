@@ -69,6 +69,7 @@ namespace BluetoothPrint.droid
 
         public bool Init(out int err, Action<string,string> ConnectedAction, Action<string> ConnectingAction, Action<string> ConnFailedAction)
         {
+            Stop();
             err = 0;
             bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
             if (bluetoothAdapter == null)
@@ -95,7 +96,7 @@ namespace BluetoothPrint.droid
         {
             if (this.chatService.GetState() == BluetoothService.STATE_CONNECTED)
             {
-                return false;
+                return true;
             }
             else
             {
@@ -204,9 +205,6 @@ namespace BluetoothPrint.droid
 
             try
             {
-
-
-
                 byte[] data = Pos.POS_PrintPicture(bitmap, 384, 0);
                 byte[] cmdData = new byte[data.Length + 6];
                 cmdData[0] = 0x1B;

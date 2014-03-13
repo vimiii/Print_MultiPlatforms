@@ -31,7 +31,7 @@ namespace USBPrint.droid
         /// <param name="dpiWidth">打印机每行dpi点数</param>
         /// <param name="err">异常</param>
         /// <returns></returns>
-        public bool Inite(Context context, int vid, int pid,int dpiWidth, out int err)
+        public bool Inite(Context context, int vid, int pid, int dpiWidth, out int err)
         {
             err = 0;
             this.dpiWidth = dpiWidth;
@@ -100,9 +100,21 @@ namespace USBPrint.droid
                 OutBuffer = targetEncoding.GetBytes(mess);       //将指定字符数组中的所有字符编码为一个字节序列,完成后outbufer里面即为简体中文编码
 
 
-                sendPackage(OutBuffer);
-                CutPage();
-                return true;
+                if (sendPackage(OutBuffer))
+                {
+                    if (CutPage())
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
             }
             else
             {
@@ -124,9 +136,21 @@ namespace USBPrint.droid
             if (bitmap != null)
             {
                 byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
-                sendPackage(data);
-                CutPage();
-                return true;
+                if (sendPackage(data))
+                {
+                    if (CutPage())
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
             }
             else
             {
@@ -137,7 +161,7 @@ namespace USBPrint.droid
         /// <summary>
         ///切纸
         /// </summary>
-        private void CutPage()
+        private bool CutPage()
         {
             byte[] cmdData = new byte[8];
 
@@ -149,8 +173,7 @@ namespace USBPrint.droid
             cmdData[5] = 0x1D;
             cmdData[6] = 0x56;
             cmdData[7] = 0x00;
-
-            sendPackage(cmdData);
+            return sendPackage(cmdData);
         }
 
         /**
@@ -269,10 +292,10 @@ namespace USBPrint.droid
         /// 发送数据包
         /// </summary>
         /// <param name="command"></param>
-        private void sendPackage(byte[] command)
+        private bool sendPackage(byte[] command)
         {
             int len = command.Length;
-            
+
             //分批发送
             int packageLength = 1000;
             Dictionary<int, byte[]> data = new System.Collections.Generic.Dictionary<int, byte[]>();
@@ -283,7 +306,7 @@ namespace USBPrint.droid
                 for (int j = 0; j < packageLength; j++)
                 {
                     int index = i * packageLength + j;
-                    if (index>=len)
+                    if (index >= len)
                     {
                         break;
                     }
@@ -294,8 +317,13 @@ namespace USBPrint.droid
 
             foreach (int i in data.Keys)
             {
-                myDeviceConnection.BulkTransfer(epOut, data[i], data[i].Length, 10000);
+                int res = myDeviceConnection.BulkTransfer(epOut, data[i], data[i].Length, 10000);
+                if (res != data[i].Length)
+                {
+                    return false;
+                }
             }
+            return true;
         }
 
     }

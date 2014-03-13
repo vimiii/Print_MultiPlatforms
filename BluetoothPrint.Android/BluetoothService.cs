@@ -417,7 +417,7 @@ namespace BluetoothPrint.droid
 					// This is a blocking call and will only return on a
 					// successful connection or an exception
 					mmSocket.Connect ();
-				} catch (Java.IO.IOException ) {
+				} catch (Java.IO.IOException  ex) {
 					_service.ConnectionFailed ();
 					// Close the socket
 					try {

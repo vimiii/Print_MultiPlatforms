@@ -127,8 +127,14 @@ namespace USBPrint.Win
 
                 int bytesWritten;
                 ec = Writer.Write(OutBuffer, 2000, out bytesWritten);
-                if (ec != ErrorCode.None) throw new Exception(UsbDevice.LastErrorString);
-
+                if (ec != ErrorCode.None) {
+                    return false;
+                }
+                else if (bytesWritten != OutBuffer.Length)
+                {
+                    return false;
+                }
+                /*
                 byte[] readBuffer = new byte[1024];
                 while (ec == ErrorCode.None)
                 {
@@ -140,8 +146,8 @@ namespace USBPrint.Win
 
                     if (bytesRead == 0) { }
                 }
-                CutPage();
-                return true;
+                */
+                return CutPage();
             }
             else
             {
@@ -165,8 +171,14 @@ namespace USBPrint.Win
                 byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
                 int bytesWritten;
                 ec = Writer.Write(data, 2000, out bytesWritten);
-                if (ec != ErrorCode.None) throw new Exception(UsbDevice.LastErrorString);
-
+                if (ec != ErrorCode.None) {
+                    return false;
+                }
+                else if (bytesWritten!=data.Length)
+                {
+                    return false;
+                }
+                /*
                 byte[] readBuffer = new byte[1024];
                 while (ec == ErrorCode.None)
                 {
@@ -178,8 +190,8 @@ namespace USBPrint.Win
 
                     if (bytesRead == 0) { }
                 }
-                CutPage();
-                return true;
+                 */
+                return CutPage();
             }
             else
             {
@@ -190,7 +202,7 @@ namespace USBPrint.Win
         /// <summary>
         ///切纸
         /// </summary>
-        private void CutPage()
+        private bool CutPage()
         {
             ErrorCode ec = ErrorCode.None;
             byte[] cmdData = new byte[8];
@@ -207,8 +219,15 @@ namespace USBPrint.Win
 
             int bytesWritten;
             ec = Writer.Write(cmdData, 2000, out bytesWritten);
-            if (ec != ErrorCode.None) throw new Exception(UsbDevice.LastErrorString);
-
+            if (ec != ErrorCode.None) {
+                return false;
+            }
+            else if (bytesWritten != cmdData.Length)
+            {
+                return false;
+            }
+            return true;
+            /*
             byte[] readBuffer = new byte[1024];
             while (ec == ErrorCode.None)
             {
@@ -220,6 +239,7 @@ namespace USBPrint.Win
 
                 if (bytesRead == 0) { }
             }
+             */
         }
 
     }
