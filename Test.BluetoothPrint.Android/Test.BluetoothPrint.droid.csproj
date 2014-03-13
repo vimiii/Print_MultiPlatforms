@@ -81,6 +81,7 @@
     <AndroidAsset Include="Assets\qq.png" />
     <AndroidAsset Include="Assets\qq2.jpg" />
     <AndroidAsset Include="Assets\T.png" />
+    <AndroidAsset Include="Assets\android.png" />
     <Content Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>

@@ -17,6 +17,7 @@ namespace Test.BluetoothPrint.droid
     [Activity(Label = "Test", MainLauncher = true, Icon = "@drawable/icon")]
     public class Activity1 : Activity
     {
+        string address = "00:02:0A:01:60:71";
         BluetoothHelper blueH = null;
         protected override void OnCreate(Bundle bundle)
         {
@@ -68,15 +69,20 @@ namespace Test.BluetoothPrint.droid
             {
                 Java.Lang.String str = new Java.Lang.String("hello");
 
-                blueH.SendMessage(str, out err);
-               
-                
-                
-    
-                Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("T.png"));
-                
-       
-                blueH.SendImg(bm,out err);
+                if (!blueH.IsConnected())
+                {
+                    if (blueH.Connect(address))
+                    {
+                        blueH.SendMessage(str, out err);
+                    }
+                }
+                else
+                {
+                    blueH.SendMessage(str, out err);
+                }
+
+                //Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("android.png"));
+                //blueH.SendImg(bm,out err);
             };
         }
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)

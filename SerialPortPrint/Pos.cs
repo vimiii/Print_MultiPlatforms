@@ -32,7 +32,23 @@ namespace PrintBase
         public static byte[] POS_PrintPicture(Bitmap mBitmap, int nWidth,
             int nMode)
         {
+            Bitmap rszBitmap;
+            int width;
+            if (nWidth == mBitmap.Width)
+            {
+                rszBitmap = mBitmap;
+                width = nWidth;
+            }
+            else
+            {
+                width = (nWidth + 7) / 8 * 8;
 
+                int height = mBitmap.Height * width / mBitmap.Width;
+
+                //Bitmap grayBitmap = toGrayscale(mBitmap);
+                rszBitmap = resizeImage(mBitmap, width, height);
+            }
+            /*
             int width = (nWidth + 7) / 8 * 8;
 
             int height = mBitmap.Height * width / mBitmap.Width;
@@ -40,7 +56,7 @@ namespace PrintBase
             //Bitmap grayBitmap = toGrayscale(mBitmap);
 
             Bitmap rszBitmap = resizeImage(mBitmap, width, height);
-
+            */
             byte[] src = bitmapToBWPix(rszBitmap);
             byte[] data = pixToCmd(src, width, nMode);
 
@@ -79,7 +95,7 @@ namespace PrintBase
 #else
             Bitmap bmp = new Bitmap(newWidth, newHeight);
             Graphics g = Graphics.FromImage(bmp);
-            
+
             Rectangle rect = new Rectangle(0, 0, newWidth, newHeight);
             g.FillRectangle(Brushes.White, rect);
 
@@ -87,7 +103,7 @@ namespace PrintBase
             g.InterpolationMode = InterpolationMode.NearestNeighbor;
 
             g.DrawImage(bitmapOrg, new Rectangle(0, 0, newWidth, newHeight), new Rectangle(0, 0, width, height), GraphicsUnit.Pixel);
-            
+
             bitmapOrg.Dispose();
             bitmapOrg = null;
             //bmp.Save("aa.jpg", System.Drawing.Imaging.ImageFormat.Png);
@@ -131,7 +147,7 @@ namespace PrintBase
 #if ANDROID
             srcBitmap.GetPixels(regIng, 0, wide, 0, 0, wide, height);
 #else
-           int index=0;
+            int index = 0;
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < wide; x++)
                 {
@@ -139,9 +155,9 @@ namespace PrintBase
                     regIng[index] = srcBitmap.GetPixel(x, y).ToArgb(); //GetCustomColor(srcColor);
 
                     index++;
-                    
+
                 }
-        
+
 #endif
             return regIng;
         }

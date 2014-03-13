@@ -74,6 +74,7 @@
   <ItemGroup>
     <AndroidAsset Include="Assets\T.png" />
     <AndroidAsset Include="Assets\tt.png" />
+    <AndroidAsset Include="Assets\setting.png" />
     <Content Include="Properties\AndroidManifest.xml" />
     <AndroidResource Include="Resources\Xml\device_filter.xml" />
   </ItemGroup>
