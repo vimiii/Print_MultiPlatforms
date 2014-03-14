@@ -23,7 +23,7 @@ namespace Test.USBPrint.Win
         {
             int vid=Convert.ToInt32(txtVid.Text);
             int pid = Convert.ToInt32(txtPid.Text);
-            print.Inite(vid,pid,576);
+            print.Inite(vid,pid,384);
         }
 
         private void btnPrint_Click(object sender, EventArgs e)

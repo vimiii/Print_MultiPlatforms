@@ -9,11 +9,11 @@ namespace PrintBase
     /// <summary>
     /// 打印机队列管理
     /// </summary>
-    public static class PrintQueue
+    public class PrintQueue
     {
         /// <summary>
         /// 打印队列
         /// </summary>
-        public static Queue<byte[]> QueueList = new Queue<byte[]>();   
+        public Queue<byte[]> QueueList = new Queue<byte[]>();   
     }
 }

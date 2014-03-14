@@ -58,6 +58,11 @@ namespace SerialPortPrint
 
             
         }
+        /// <summary>
+        /// 初始化打印机
+        /// </summary>
+        /// <param name="err"></param>
+        /// <returns></returns>
         public bool PrintInit(out string err) {
             err = "";
             server.DataReceived += server_DataReceived;

@@ -22,7 +22,7 @@ namespace USBPrint.Win
         public void Inite(int vid, int pid,int dpiWidth)
         {
             this.dpiWidth = dpiWidth;
-            MyUsbFinder = new UsbDeviceFinder(1659, 8965);
+            MyUsbFinder = new UsbDeviceFinder(vid, pid);
         }
         public bool IsOpen()
         {
