@@ -3,14 +3,29 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
+    <EditText
+        android:id="@+id/vid"
+        android:layout_width="336dp"
+        android:layout_height="30dp"
+        android:gravity="center_vertical"
+        android:inputType="none"
+        android:text="1659"
+        android:paddingLeft="15px"
+        android:textColor="#FF999999"
+        android:textColorHint="#CCCCCC" />
+    <EditText
+        android:id="@+id/pid"
+        android:layout_width="336dp"
+        android:layout_height="70dp"
+        android:text="8963"
+        android:gravity="center_vertical"
+        android:inputType="none"
+        android:paddingLeft="15px"
+        android:textColor="#FF999999"
+        android:textColorHint="#CCCCCC" />
     <Button
         android:id="@+id/MyButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/Hello" />
-    <Button
-        android:text="Button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/button1" />
+        android:text="打印" />
 </LinearLayout>

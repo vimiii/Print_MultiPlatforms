@@ -183,7 +183,7 @@ namespace PrintBase
             {
                 for (int x = 0; x < xsize; x++)
                 {
-                    if ((orgpixels[k] & 0xFF) > Floyd16x16[(x & 0xF)][(y & 0xF)])
+                    if ((orgpixels[k] & 0xFF)> Floyd16x16[(x & 0xF)][(y & 0xF)])
                         despixels[k] = 0;
                     else
                     {

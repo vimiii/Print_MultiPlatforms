@@ -41,9 +41,10 @@
   <ItemGroup>
     <Compile Include="Log.cs" />
     <Compile Include="Pos.cs" />
+    <Compile Include="PrintCommand.cs" />
     <Compile Include="PrintHelper.cs" />
     <Compile Include="PrintQueue.cs" />
-    <Compile Include="PrintState.cs" />
+    <Compile Include="PrintError.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

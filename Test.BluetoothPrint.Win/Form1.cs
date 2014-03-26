@@ -44,23 +44,7 @@ namespace Test.BluetoothPrint.Win
         private void button2_Click(object sender, EventArgs e)
         {
             Bitmap bitmap = new Bitmap("Test.png");
-
-
             byte[] data = Pos.POS_PrintPicture(bitmap, 384, 0);
-            /*
-            byte[] cmdData = new byte[data.Length + 6];
-            cmdData[0] = 0x1B;
-            cmdData[1] = 0x2A;
-            cmdData[2] = 0x32;
-            cmdData[3] = 0x20;
-            cmdData[4] = 0x2;
-            cmdData[5] = 0x50;
-            for (int i = 0; i < data.Length; i++)
-            {
-                cmdData[6 + i] = data[i];
-            }
-             * */
-
             blueClient.Client.Send(data).ToString();
          
         }

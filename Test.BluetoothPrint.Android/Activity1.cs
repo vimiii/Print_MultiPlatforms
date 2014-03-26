@@ -42,13 +42,13 @@ namespace Test.BluetoothPrint.droid
 
 
 
-            if (!blueH.Init(out err, ConnectedAction, ConnectingAction, ConnFailedAction))
+            if (blueH.Init(ConnectedAction, ConnectingAction, ConnFailedAction)==1)
             {
                 //蓝牙不存在
             }
             else
             {
-                if (!blueH.IsOpen())
+                if (blueH.IsOpen()==1)
                 {
                     //打开蓝牙
                     blueH.Open(this);
@@ -69,16 +69,16 @@ namespace Test.BluetoothPrint.droid
             {
                 Java.Lang.String str = new Java.Lang.String("hello");
 
-                if (!blueH.IsConnected())
+                if (blueH.IsConnected()==1)
                 {
-                    if (blueH.Connect(address))
+                    if (blueH.Connect(address)==1)
                     {
-                        blueH.SendMessage(str, out err);
+                        blueH.SendMessage(str);
                     }
                 }
                 else
                 {
-                    blueH.SendMessage(str, out err);
+                    blueH.SendMessage(str);
                 }
 
                 //Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("android.png"));

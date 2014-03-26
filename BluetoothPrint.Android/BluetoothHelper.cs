@@ -5,6 +5,7 @@ using Android.Graphics;
 using Android.OS;
 using Android.Widget;
 using PrintBase;
+using SerialPortPrint;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -67,40 +68,52 @@ namespace BluetoothPrint.droid
             }
         }
 
-        public bool Init(out int err, Action<string,string> ConnectedAction, Action<string> ConnectingAction, Action<string> ConnFailedAction)
+        public int Init(Action<string,string> ConnectedAction, Action<string> ConnectingAction, Action<string> ConnFailedAction)
         {
+            int err = 0;
             Stop();
-            err = 0;
             bluetoothAdapter = BluetoothAdapter.DefaultAdapter;
             if (bluetoothAdapter == null)
             {
-                err =2;
-                return false;
+                err =(int)PrintError.NotSupportBluetooth;
+                return err;
             }
             else
             {
                 chatService = new BluetoothService(new MyHandler(this, ConnectedAction, ConnectingAction, ConnFailedAction));
-                return true;
+                err = 1;
+                return err;
             }
         }
         /// <summary>
         /// 判断蓝牙是否打开
         /// </summary>
         /// <returns></returns>
-        public bool IsOpen()
+        public int IsOpen()
         {
-            isopen = this.bluetoothAdapter.IsEnabled;
-            return isopen;
-        }
-        public bool IsConnected()
-        {
-            if (this.chatService.GetState() == BluetoothService.STATE_CONNECTED)
+            int err = 0;
+            if (this.bluetoothAdapter.IsEnabled)
             {
-                return true;
+                err = (int)PrintError.NotSupportBluetooth;
             }
             else
             {
-                return false;
+                err = 1;
+            }
+            return err;
+        }
+        public int IsConnected()
+        {
+            int err = 0;
+            if (this.chatService.GetState() == BluetoothService.STATE_CONNECTED)
+            {
+                err = 1;
+                return err;
+            }
+            else
+            {
+                err = (int)PrintError.ConnectedFailure;
+                return err;
             }
         }
         /// <summary>
@@ -127,15 +140,18 @@ namespace BluetoothPrint.droid
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        public bool Connect(string address)
+        public int Connect(string address)
         {
+            int err = 0;
             if (!isopen)
             {
-                return false;
+                err = (int)PrintError.OpenFailure;
+                return err;
             }
             BluetoothDevice device = bluetoothAdapter.GetRemoteDevice(address);
             chatService.Connect(device);
-            return true;
+            err = 1;
+            return err;
         }
        /// <summary>
        /// 打印文本内容
@@ -143,35 +159,36 @@ namespace BluetoothPrint.droid
        /// <param name="message">打印的内容</param>
         /// <param name="err">2:没有开启蓝牙，3：没有连接打印机，4：butmap为null,5:程序出现异常</param>
        /// <returns></returns>
-        public bool SendMessage(Java.Lang.String message, out int err)
+        public int SendMessage(Java.Lang.String message)
         {
-            err = 0;
+           int err =0;
             if (!isopen)
             {
-                err = 2;
-                return false;
+                err =(int)PrintError.OpenFailure;
+                return err;
             }
             if (this.chatService.GetState() != BluetoothService.STATE_CONNECTED)
             {
-                err = 3;
-                return false;
+                err = (int)PrintError.ConnectedFailure;
+                return err;
             }
 
             if (message.Length() <= 0)
             {
-                err = 4;
-                return false;
+                err = (int)PrintError.SendNull; ;
+                return err;
             }
             try
             {
                 byte[] send = message.GetBytes();
                 chatService.Write(send);
-                return true;
+                err = 1;
+                return err;
             }
             catch
             {
-                err = 5;
-                return false;
+                err = (int)PrintError.SendFailure; ;
+                return err;
             }
 
             // Get the message bytes and tell the BluetoothService to write
@@ -183,29 +200,29 @@ namespace BluetoothPrint.droid
        /// <param name="bitmap">图片</param>
        /// <param name="err">2:没有开启蓝牙，3：没有连接打印机，4：butmap为null,5:程序出现异常</param>
        /// <returns></returns>
-        public bool SendImg(Bitmap bitmap, out int err)
+        public int SendImg(Bitmap bitmap,int dpiWidth)
         {
-            err = 0;
+            int err = 0;
             if (!isopen)
             {
-                err = 2;
-                return false;
+                err = (int)PrintError.OpenFailure;
+                return err;
             }
             if (this.chatService.GetState() != BluetoothService.STATE_CONNECTED)
             {
-                err = 3;
-                return false;
+                err = (int)PrintError.ConnectedFailure ;
+                return err;
             }
 
             if (bitmap == null)
             {
-                err = 4;
-                return false;
+                err = (int)PrintError.SendNull ; 
+                return err;
             }
 
             try
             {
-                byte[] data = Pos.POS_PrintPicture(bitmap, 384, 0);
+                byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
                 byte[] cmdData = new byte[data.Length + 6];
                 cmdData[0] = 0x1B;
                 cmdData[1] = 0x2A;
@@ -218,12 +235,51 @@ namespace BluetoothPrint.droid
                     cmdData[6 + i] = data[i];
                 }
                 chatService.Write(data);
-
-                return true;
+                err = 1;
+                return err;
             }
             catch {
-                err = 5;
-                return false;
+                err = (int)PrintError.SendFailure ;
+                return err;
+            }
+        }
+        /// <summary>
+        ///切纸
+        /// </summary>
+        public int CutPage()
+        {
+            int err = 0;
+            try
+            {
+                byte[] cmdData = PrintCommand.Cut();
+                chatService.Write(cmdData);
+                err = 1;
+                return err;
+            }
+            catch
+            {
+                err = (int)PrintError.SendFailure;
+                return err;
+            }
+        }
+        /// <summary>
+        /// 走纸
+        /// </summary>
+        /// <param name="row"></param>
+        public int WalkPaper(int row)
+        {
+            int err = 0;
+            try
+            {
+                byte[] cmdData = PrintCommand.WalkPaper(row);
+                chatService.Write(cmdData);
+                err = 1;
+                return err;
+            }
+            catch
+            {
+                err = (int)PrintError.SendFailure;
+                return err;
             }
         }
 

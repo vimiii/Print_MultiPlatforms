@@ -48,7 +48,12 @@
     <Compile Include="..\SerialPortPrint\Pos.cs">
       <Link>Pos.cs</Link>
     </Compile>
-    <Compile Include="BluetoothErrorEnum.cs" />
+    <Compile Include="..\SerialPortPrint\PrintCommand.cs">
+      <Link>PrintCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\SerialPortPrint\PrintError.cs">
+      <Link>PrintError.cs</Link>
+    </Compile>
     <Compile Include="BluetoothHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

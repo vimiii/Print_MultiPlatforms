@@ -69,15 +69,15 @@ namespace Test.SerialPortPrint
             }
             print1.PrintCallback = (state) =>
             {
-                if (state == PrintState.Nopaper)
+                if (state == PrintError.Nopaper)
                 {
                     MessageBox.Show("缺纸");
                 }
-                else if (state == PrintState.Error)
+                else if (state == PrintError.Error)
                 {
                     MessageBox.Show("打印机异常");
                 }
-                else if (state == PrintState.Normal)
+                else if (state == PrintError.Normal)
                 {
                     MessageBox.Show("打印机正常");
                 }

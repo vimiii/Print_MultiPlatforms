@@ -2,6 +2,7 @@
 using InTheHand.Net.Bluetooth;
 using InTheHand.Net.Sockets;
 using PrintBase;
+using SerialPortPrint;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BluetoothPrint
+namespace BluetoothPrint.Win
 {
     public class BluetoothHelper:IDisposable
     {
@@ -24,12 +25,31 @@ namespace BluetoothPrint
         {
             blueClient = new BluetoothClient();
         }
-
+        /// <summary>
+        /// 蓝牙连接状态
+        /// </summary>
+        /// <returns></returns>
+        public int IsConnected()
+        {
+            int err = 0;
+            if (blueClient != null)
+            {
+                if (blueClient.Connected)
+                {
+                    err = 1;
+                }
+                else
+                {
+                    err = (int)PrintError.ConnectedFailure;
+                }
+            }
+            return err;
+        }
 
         /// <summary>
         /// 异步扫描蓝牙设备
         /// </summary>
-        public void ScanAsync(Action<bool> ScanOver)
+        public void ScanAsync(Action<Dictionary<string, BluetoothAddress>> ScanOver)
         {
             Task.Factory.StartNew(() =>
             {
@@ -38,21 +58,25 @@ namespace BluetoothPrint
                     BluetoothRadio BuleRadio = BluetoothRadio.PrimaryRadio;
                     BuleRadio.Mode = RadioMode.Connectable;
                     BluetoothDeviceInfo[] Devices = blueClient.DiscoverDevices();
+                   
                     deviceAddress.Clear();
                     foreach (BluetoothDeviceInfo device in Devices)
                     {
-                        deviceAddress[device.DeviceName] = device.DeviceAddress;
+                        if (!deviceAddress.Keys.Contains(device.DeviceName))
+                        {
+                            deviceAddress[device.DeviceName] = device.DeviceAddress;
+                        }
                     }
                     if (ScanOver != null)
                     {
-                        ScanOver(true);
+                        ScanOver(deviceAddress);
                     }
                 }
                 catch(Exception ex)
                 {
                     if (ScanOver != null)
                     {
-                        ScanOver(false);
+                        ScanOver(null);
                     }
                 }
                 
@@ -64,17 +88,20 @@ namespace BluetoothPrint
         /// <param name="address">蓝牙设备地址</param>
         /// <param name="pwd">连接密码</param>
         /// <returns></returns>
-        public bool Connect(BluetoothAddress address, string pwd)
+        public int Connect(BluetoothAddress address, string pwd)
         {
+            int err = 0;
             try
             {
                 blueClient.SetPin(address, pwd);
                 blueClient.Connect(address, BluetoothService.SerialPort);
-                return true;
+                err = 1;
+                return err;
             }
             catch(Exception ex)
             {
-                return false;
+                err = (int)PrintError.ConnectedFailure;
+                return err;
             }
         }
         /// <summary>
@@ -90,9 +117,9 @@ namespace BluetoothPrint
         /// </summary>
         /// <param name="mess"></param>
         /// <returns></returns>
-        public bool PrintString(string mess,out int error)
+        public int PrintString(string mess)
         {
-            error = 0;
+            int err = 0;
             if (blueClient.Connected)
             {
                 byte[] OutBuffer;//数据
@@ -103,35 +130,88 @@ namespace BluetoothPrint
                 BufferSize = targetEncoding.GetByteCount(mess); //计算对指定字符数组中的所有字符进行编码所产生的字节数           
                 OutBuffer = new byte[BufferSize];
                 OutBuffer = targetEncoding.GetBytes(mess);       //将指定字符数组中的所有字符编码为一个字节序列,完成后outbufer里面即为简体中文编码
-                blueClient.Client.Send(OutBuffer);
-                
-                return true;
+                int res= blueClient.Client.Send(OutBuffer);
+
+                if (res == BufferSize)
+                {
+                    err = 1;
+                }
+                else
+                {
+                    err = (int)PrintError.SendFailure;
+                }
             }
             else
             {
-                error =(int)BluetoothErrorEnum.NotConnected;
-                return false;
+                err =(int)PrintError.NotConnectedBluetooth;
+                
             }
+            return err;
         }
         /// <summary>
         /// 打印图片
         /// </summary>
         /// <param name="bitmap"></param>
         /// <returns></returns>
-        public bool PrintImg(Bitmap bitmap,out int error)
+        public int PrintImg(Bitmap bitmap, int dpiWidth)
         {
-            error = 0;
+            int err = 0;
             if (blueClient.Connected)
             {
-                byte[] data = Pos.POS_PrintPicture(bitmap, 384, 0);
-                blueClient.Client.Send(data);
-                return true;
+                byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
+                int res= blueClient.Client.Send(data);
+                if (res == data.Length)
+                {
+                    err = 1;
+                }
+                else
+                {
+                    err = (int)PrintError.SendFailure;
+                }
             }
             else
             {
-                error = (int)BluetoothErrorEnum.NotConnected;
-                return false;
+                err = (int)PrintError.NotConnectedBluetooth;
             }
+            return err;
+        }
+
+        /// <summary>
+        ///切纸
+        /// </summary>
+        public int CutPage()
+        {
+            int err=0;
+            byte[] cmdData = PrintCommand.Cut();
+            int res= blueClient.Client.Send(cmdData);
+            if (res == cmdData.Length)
+            {
+                err = 1;
+            }
+            else
+            {
+                err = (int)PrintError.SendFailure;
+            }
+            return err;
+        }
+        /// <summary>
+        /// 走纸
+        /// </summary>
+        /// <param name="row"></param>
+        public int WalkPaper(int row)
+        {
+            int err = 0;
+            byte[] cmdData = PrintCommand.WalkPaper(row);
+            int res= blueClient.Client.Send(cmdData);
+            if( res == cmdData.Length)
+            {
+                err = 1;
+            }
+            else
+            {
+                err = (int)PrintError.SendFailure;
+            }
+            return err;
         }
 
 

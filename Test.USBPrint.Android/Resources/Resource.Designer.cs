@@ -65,11 +65,14 @@ namespace Test.USBPrint.droid
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f070000
-			public const int MyButton = 2131165184;
+			// aapt resource value: 0x7f070002
+			public const int MyButton = 2131165186;
 			
 			// aapt resource value: 0x7f070001
-			public const int button1 = 2131165185;
+			public const int pid = 2131165185;
+			
+			// aapt resource value: 0x7f070000
+			public const int vid = 2131165184;
 			
 			static Id()
 			{

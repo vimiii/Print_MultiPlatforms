@@ -41,11 +41,14 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\BluetoothPrint.Win\BluetoothErrorEnum.cs">
-      <Link>BluetoothErrorEnum.cs</Link>
-    </Compile>
     <Compile Include="..\SerialPortPrint\Pos.cs">
       <Link>Pos.cs</Link>
+    </Compile>
+    <Compile Include="..\SerialPortPrint\PrintCommand.cs">
+      <Link>PrintCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\SerialPortPrint\PrintError.cs">
+      <Link>PrintError.cs</Link>
     </Compile>
     <Compile Include="BluetoothHelper.cs" />
     <Compile Include="BluetoothService.cs" />

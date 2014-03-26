@@ -8,6 +8,7 @@ using Android.Graphics;
 using Android.Content;
 using Android.Util;
 using PrintBase;
+using SerialPortPrint;
 
 namespace USBPrint.droid
 {
@@ -20,8 +21,11 @@ namespace USBPrint.droid
         private UsbEndpoint epOut;
         private UsbEndpoint epIn;
         UsbDeviceConnection myDeviceConnection = null;
-        private int dpiWidth;
         List<int> productList = new List<int>();
+        public PrintHelper()
+        {
+
+        }
         /// <summary>
         /// 初始化
         /// </summary>
@@ -31,63 +35,63 @@ namespace USBPrint.droid
         /// <param name="dpiWidth">打印机每行dpi点数</param>
         /// <param name="err">异常</param>
         /// <returns></returns>
-        public bool Inite(Context context, int vid, int pid, int dpiWidth, out int err)
+        public int Inite(Context context, int vid, int pid)
         {
-            err = 0;
-            this.dpiWidth = dpiWidth;
+            int err = 0;
             // 获取UsbManager
             myUsbManager = (UsbManager)context.GetSystemService(UsbService);
 
             if (!enumerateDevice(vid, pid))
             {
-                err = 1;//未找到设备
-                return false;
+                err = (int)PrintError.NotFindDevice;//未找到设备
+                return err;
             }
 
             findInterface();
 
             assignEndpoint();
-
-            return true;
+            return openDevice();
         }
-        public bool IsOpen()
+        public int IsOpen()
         {
+            int err = 0;
             if (myDeviceConnection != null)
             {
-                return true;
+                err = (int)PrintError.Error;
+                return err;
             }
             else
             {
-                return false;
+                err = 1;
+                return err;
             }
         }
-        public bool Open()
+        public int Open()
         {
-            if (openDevice())
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
+            int err = 0;
+            err= openDevice();
+            return err;
         }
         /// <summary>
         /// 释放连接
         /// </summary>
         public void Close()
         {
-            myDeviceConnection.Close();
+
+            if (myDeviceConnection != null)
+            {
+                myDeviceConnection.Close();
+                myDeviceConnection = null;
+            }
         }
         /// <summary>
         /// 打印文本
         /// </summary>
         /// <param name="mess"></param>
         /// <returns></returns>
-        public bool PrintString(string mess, out int error)
+        public int PrintString(string mess)
         {
-            error = 0;
+            int err = 0;
             if (!String.IsNullOrEmpty(mess))
             {
                 byte[] OutBuffer;//数据
@@ -99,29 +103,20 @@ namespace USBPrint.droid
                 OutBuffer = new byte[BufferSize];
                 OutBuffer = targetEncoding.GetBytes(mess);       //将指定字符数组中的所有字符编码为一个字节序列,完成后outbufer里面即为简体中文编码
 
-
                 if (sendPackage(OutBuffer))
                 {
-                    if (CutPage())
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    err = 1;
                 }
                 else
                 {
-                    return false;
+                    err = (int)PrintError.SendFailure;
                 }
             }
             else
             {
-                error = 10;
-                return false;
+                err = (int)PrintError.SendNull;
             }
-
+            return err;
 
         }
         /// <summary>
@@ -129,51 +124,69 @@ namespace USBPrint.droid
         /// </summary>
         /// <param name="bitmap"></param>
         /// <returns></returns>
-        public bool PrintImg(Bitmap bitmap, out int error)
+        public int PrintImg(Bitmap bitmap, int dpiWidth)
         {
-            error = 0;
+            int err = 0;
 
             if (bitmap != null)
             {
-                byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
-                if (sendPackage(data))
+                try
                 {
-                    if (CutPage())
+                    byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
+                    if (sendPackage(data))
                     {
-                        return true;
+                        err = 1;
                     }
                     else
                     {
-                        return false;
+                        err = (int)PrintError.SendFailure;
                     }
                 }
-                else
+                catch
                 {
-                    return false;
+                    err = (int)PrintError.PosCMDErr;
                 }
             }
             else
             {
-                error = 10;
-                return false;
+                err = (int)PrintError.SendNull;
             }
+            return err;
         }
         /// <summary>
         ///切纸
         /// </summary>
-        private bool CutPage()
+        public int CutPage()
         {
-            byte[] cmdData = new byte[8];
-
-            cmdData[0] = 0x1B;
-            cmdData[1] = 0x64;
-            cmdData[2] = 0x04;
-            cmdData[3] = 0x1B;
-            cmdData[4] = 0x40;
-            cmdData[5] = 0x1D;
-            cmdData[6] = 0x56;
-            cmdData[7] = 0x00;
-            return sendPackage(cmdData);
+            int err = 0;
+            byte[] cmdData = PrintCommand.Cut();
+            if (sendPackage(cmdData))
+            {
+                err = 1;
+            }
+            else
+            {
+                err = (int)PrintError.SendFailure;
+            }
+            return err;
+        }
+        /// <summary>
+        /// 走纸
+        /// </summary>
+        /// <param name="row"></param>
+        public int WalkPaper(int row)
+        {
+            int err = 0;
+            byte[] cmdData = PrintCommand.WalkPaper(row);
+            if (sendPackage(cmdData))
+            {
+                err = 1;
+            }
+            else
+            {
+                err = (int)PrintError.SendFailure;
+            }
+            return err;
         }
 
         /**
@@ -181,62 +194,88 @@ namespace USBPrint.droid
   */
         private void assignEndpoint()
         {
+            /*
+            string mess = "1111111111111111111111111111111111";
+            byte[] OutBuffer;//数据
+            int BufferSize;
+            Encoding targetEncoding;
+            //将[UNICODE编码]转换为[GB码]，仅使用于简体中文版mobile
+            targetEncoding = Encoding.GetEncoding(0);    //得到简体中文字码页的编码方式，因为是简体中文操作系统，参数用0就可以，用936也行。
+            BufferSize = targetEncoding.GetByteCount(mess); //计算对指定字符数组中的所有字符进行编码所产生的字节数           
+            OutBuffer = new byte[BufferSize];
+            OutBuffer = targetEncoding.GetBytes(mess);       //将指定字符数组中的所有字符编码为一个字节序列,完成后outbufer里面即为简体中文编码
+            */
             try
             {
                 for (int i = 0; i < myInterface.EndpointCount; i++)
                 {
-                    UsbEndpoint point = myInterface.GetEndpoint(i);
-                    if (point.Direction == UsbAddressing.Out)
+                    try
                     {
-                        epOut = point;
+                        UsbEndpoint point = myInterface.GetEndpoint(i);
+                        //int res = myDeviceConnection.BulkTransfer(point, OutBuffer, BufferSize, 10000);
+                        if (point.Direction == UsbAddressing.Out)
+                        {
+                            epOut = point;
+                        }
+                        else
+                        {
+                            epIn = point;
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        epIn = point;
+
                     }
+
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                // throw ex;
             }
         }
 
         /**
          * 打开设备
          */
-        private bool openDevice()
+        private int openDevice()
         {
+            int err = 0;
             if (myInterface != null)
             {
                 UsbDeviceConnection conn = null;
                 // 在open前判断是否有连接权限；对于连接权限可以静态分配，也可以动态分配权限，可以查阅相关资料
+                // conn = myUsbManager.OpenDevice(myUsbDevice);
                 if (myUsbManager.HasPermission(myUsbDevice))
                 {
                     conn = myUsbManager.OpenDevice(myUsbDevice);
                 }
                 else
                 {
+                    err = (int)PrintError.NoPermission;
                     Log.Debug("err", "没有连接权限");
-                    return false;
+                    return err;
                 }
 
                 if (conn.ClaimInterface(myInterface, true))
                 {
                     myDeviceConnection = conn; // 到此你的android设备已经连上HID设备
                     Log.Debug("info", "连接HID设备成功");
-                    return true;
+                    err = 1;
+                    return err;
                 }
                 else
                 {
+                    err = (int)PrintError.ConnectedFailure;
                     Log.Debug("err", "连接HID设备失败");
                     conn.Close();
-                    return false;
+                    return err;
                 }
             }
             else
             {
-                return false;
+                err = (int)PrintError.Error;
+                return err;
             }
         }
 
@@ -250,11 +289,16 @@ namespace USBPrint.droid
                 for (int i = 0; i < myUsbDevice.InterfaceCount; i++)
                 {
                     UsbInterface intf = myUsbDevice.GetInterface(i);
+                    myInterface = intf;
+                    //openDevice();
+                    //assignEndpoint();
+
                     if (intf.EndpointCount >= 2)
                     {
                         myInterface = intf;
                         break;
                     }
+
                 }
             }
         }
@@ -276,7 +320,7 @@ namespace USBPrint.droid
                 if (kv.Value.ProductId == pid && kv.Value.VendorId == vid)
                 {
                     myUsbDevice = kv.Value;
-                    break;
+                    //break;
                 }
             }
             if (myUsbDevice == null)
@@ -294,6 +338,10 @@ namespace USBPrint.droid
         /// <param name="command"></param>
         private bool sendPackage(byte[] command)
         {
+            if (myDeviceConnection==null)
+            {
+                return false;
+            }
             int len = command.Length;
 
             //分批发送

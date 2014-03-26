@@ -46,6 +46,12 @@
     <Compile Include="..\SerialPortPrint\Pos.cs">
       <Link>Pos.cs</Link>
     </Compile>
+    <Compile Include="..\SerialPortPrint\PrintCommand.cs">
+      <Link>PrintCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\SerialPortPrint\PrintError.cs">
+      <Link>PrintError.cs</Link>
+    </Compile>
     <Compile Include="PrintHelper.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

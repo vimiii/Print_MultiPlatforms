@@ -81,7 +81,7 @@
             this.txtVid.Name = "txtVid";
             this.txtVid.Size = new System.Drawing.Size(100, 21);
             this.txtVid.TabIndex = 4;
-            this.txtVid.Text = "1659";
+            this.txtVid.Text = "4070";
             // 
             // txtPid
             // 
@@ -89,7 +89,7 @@
             this.txtPid.Name = "txtPid";
             this.txtPid.Size = new System.Drawing.Size(100, 21);
             this.txtPid.TabIndex = 5;
-            this.txtPid.Text = "8965";
+            this.txtPid.Text = "33054";
             // 
             // btnString
             // 

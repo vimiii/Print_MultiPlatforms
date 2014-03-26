@@ -1,6 +1,7 @@
 ﻿using LibUsbDotNet;
 using LibUsbDotNet.Main;
 using PrintBase;
+using SerialPortPrint;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -17,26 +18,35 @@ namespace USBPrint.Win
         private UsbDeviceFinder MyUsbFinder;
         private UsbEndpointWriter Writer;
         private UsbEndpointReader Reader;
-        private int dpiWidth;
 
-        public void Inite(int vid, int pid,int dpiWidth)
+        public int Inite(int vid, int pid)
         {
-            this.dpiWidth = dpiWidth;
             MyUsbFinder = new UsbDeviceFinder(vid, pid);
+            return Open();
         }
-        public bool IsOpen()
+        public int IsOpen()
         {
+            int err=0;
             if (MyUsbDevice != null)
             {
-                return MyUsbDevice.IsOpen;
+                if (MyUsbDevice.IsOpen)
+                {
+                    err = 1;
+                }
+                else
+                {
+                    err = (int)PrintError.OpenFailure;
+                }
             }
             else
             {
-                return false;
+                err = (int)PrintError.NotFindDevice;
             }
+            return err;
         }
-        public bool Open()
+        public int Open()
         {
+            int err = 0;
             try
             {
                 if (MyUsbFinder != null)
@@ -44,7 +54,8 @@ namespace USBPrint.Win
                     MyUsbDevice = UsbDevice.OpenUsbDevice(MyUsbFinder);
                     if (MyUsbDevice == null)
                     {
-                        return false;
+                        err = (int)PrintError.NotFindDevice;
+                        return err;
                     }
                     IUsbDevice wholeUsbDevice = MyUsbDevice as IUsbDevice;
                     if (!ReferenceEquals(wholeUsbDevice, null))
@@ -58,20 +69,24 @@ namespace USBPrint.Win
                         // Claim interface #0.
                         wholeUsbDevice.ClaimInterface(0);
                     }
-                    Writer = MyUsbDevice.OpenEndpointWriter(WriteEndpointID.Ep01);
-                    Reader = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01);
-
-                    return true;
+                    //选择正确的EndPoint
+                    int point = ChooseEndpoint(MyUsbDevice);
+                    Writer = MyUsbDevice.OpenEndpointWriter((WriteEndpointID)point);
+                    Reader = MyUsbDevice.OpenEndpointReader((ReadEndpointID)(point+128));
+                    err = 1;
+                    return err;
                 }
                 else
                 {
-                    return false;
+                    err = (int)PrintError.Error;
+                    return err;
                 }
 
             }
             catch
             {
-                return false;
+                err = (int)PrintError.Error;
+                return err;
             }
 
         }
@@ -109,11 +124,10 @@ namespace USBPrint.Win
         /// </summary>
         /// <param name="mess"></param>
         /// <returns></returns>
-        public bool PrintString(string mess, out int error)
+        public int PrintString(string mess)
         {
-            error = 0;
+           int err =0;
             ErrorCode ec = ErrorCode.None;
-            error = 0;
             if (!String.IsNullOrEmpty(mess) && MyUsbDevice.IsOpen)
             {
                 byte[] OutBuffer;//数据
@@ -128,11 +142,13 @@ namespace USBPrint.Win
                 int bytesWritten;
                 ec = Writer.Write(OutBuffer, 2000, out bytesWritten);
                 if (ec != ErrorCode.None) {
-                    return false;
+                    err = (int)PrintError.SendFailure;
+                    return err;
                 }
                 else if (bytesWritten != OutBuffer.Length)
                 {
-                    return false;
+                    err = (int)PrintError.SendFailure;
+                    return err;
                 }
                 /*
                 byte[] readBuffer = new byte[1024];
@@ -147,12 +163,13 @@ namespace USBPrint.Win
                     if (bytesRead == 0) { }
                 }
                 */
-                return CutPage();
+                err = 1;
+                return err;
             }
             else
             {
-                error = 10;
-                return false;
+                err = (int)PrintError.SendNull;
+                return err;
             }
 
 
@@ -162,71 +179,75 @@ namespace USBPrint.Win
         /// </summary>
         /// <param name="bitmap"></param>
         /// <returns></returns>
-        public bool PrintImg(Bitmap bitmap, out int error)
+        public int PrintImg(Bitmap bitmap, int dpiWidth)
         {
-            error = 0;
+            int err = 0;
             ErrorCode ec = ErrorCode.None;
             if (bitmap!=null && MyUsbDevice.IsOpen)
             {
-                byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
-                int bytesWritten;
-                ec = Writer.Write(data, 2000, out bytesWritten);
-                if (ec != ErrorCode.None) {
-                    return false;
-                }
-                else if (bytesWritten!=data.Length)
+                try
                 {
-                    return false;
+                    byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
+
+                    byte[] cmdData = new byte[data.Length + 6];
+                    cmdData[0] = 0x1B;
+                    cmdData[1] = 0x2A;
+                    cmdData[2] = 0x0;
+                    cmdData[3] = 0x50;
+                    cmdData[4] = 0x3;
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        cmdData[6 + i] = data[i];
+                    }
+                    int bytesWritten;
+                    ec = Writer.Write(data, 10000, out bytesWritten);
+                    if (ec != ErrorCode.None)
+                    {
+                        err = (int)PrintError.SendFailure;
+                        return err;
+                    }
+                    else if (bytesWritten != data.Length)
+                    {
+                        err = (int)PrintError.SendFailure;
+                        return err;
+                    }
+                    err = 1;
+                    return err;
                 }
-                /*
-                byte[] readBuffer = new byte[1024];
-                while (ec == ErrorCode.None)
+                catch
                 {
-                    int bytesRead;
-
-                    // If the device hasn't sent data in the last 100 milliseconds,
-                    // a timeout error (ec = IoTimedOut) will occur. 
-                    ec = Reader.Read(readBuffer, 100, out bytesRead);
-
-                    if (bytesRead == 0) { }
+                    err = (int)PrintError.PosCMDErr;
+                    return err;
                 }
-                 */
-                return CutPage();
             }
             else
             {
-                error = 10;
-                return false;
+                err = (int)PrintError.SendNull;
+                return err;
             }
         }
         /// <summary>
         ///切纸
         /// </summary>
-        private bool CutPage()
+        public int CutPage()
         {
+            int err = 0;
             ErrorCode ec = ErrorCode.None;
-            byte[] cmdData = new byte[8];
-
-            cmdData[0] = 0x1B;
-            cmdData[1] = 0x64;
-            cmdData[2] = 0x04;
-            cmdData[3] = 0x1B;
-            cmdData[4] = 0x40;
-            cmdData[5] = 0x1D;
-            cmdData[6] = 0x56;
-            cmdData[7] = 0x00;
-
+            byte[] cmdData = SerialPortPrint.PrintCommand.Cut();
 
             int bytesWritten;
             ec = Writer.Write(cmdData, 2000, out bytesWritten);
             if (ec != ErrorCode.None) {
-                return false;
+                err = (int)PrintError.SendFailure;
+                return err;
             }
             else if (bytesWritten != cmdData.Length)
             {
-                return false;
+                err = (int)PrintError.SendFailure;
+                return err;
             }
-            return true;
+            err = 1;
+            return err;
             /*
             byte[] readBuffer = new byte[1024];
             while (ec == ErrorCode.None)
@@ -241,6 +262,158 @@ namespace USBPrint.Win
             }
              */
         }
+        /// <summary>
+        /// 走纸
+        /// </summary>
+        /// <param name="row"></param>
+        public int WalkPaper(int row)
+        {
+            int err = 0;
+            ErrorCode ec = ErrorCode.None;
+            byte[] cmdData = PrintCommand.WalkPaper(row);
+            int bytesWritten;
+            ec = Writer.Write(cmdData, 2000, out bytesWritten);
+            if (ec != ErrorCode.None)
+            {
+                err = (int)PrintError.SendFailure;
+                return err;
+            }
+            else if (bytesWritten != cmdData.Length)
+            {
+                err = (int)PrintError.SendFailure;
+                return err;
+            }
+            err = 1;
+            return err;
+        }
 
+        private int ChooseEndpoint(UsbDevice UsbDevice)
+        { 
+            UsbEndpointWriter mywrite;
+            byte[] OutBuffer;//数据
+            int bytesWritten;
+            ErrorCode err;
+            Encoding targetEncoding;
+            targetEncoding = Encoding.GetEncoding(0);
+            OutBuffer = targetEncoding.GetBytes("ok");
+
+            byte[] cmdData = new byte[8];
+            cmdData[0] = 0x1B;
+            cmdData[1] = 0x64;
+            cmdData[2] = 0x04;
+            cmdData[3] = 0x1B;
+            cmdData[4] = 0x40;
+            cmdData[5] = 0x1D;
+            cmdData[6] = 0x56;
+            cmdData[7] = 0x00;
+           
+
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep01);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep01;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep02);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep02;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep03);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep03;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep04);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep04;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep05);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep05;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep06);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep06;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep07);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep07;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep08);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep08;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep09);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep09;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep10);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep10;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep11);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep11;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep12);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep12;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep13);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep13;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep14);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep14;
+            }
+            mywrite = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep15);
+            err = mywrite.Write(OutBuffer, 2000, out bytesWritten);
+            if (err == ErrorCode.None)
+            {
+                mywrite.Write(cmdData, 2000, out bytesWritten);
+                return (int)WriteEndpointID.Ep15;
+            }
+            return 0;
+        }
     }
 }

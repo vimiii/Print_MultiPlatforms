@@ -29,7 +29,7 @@ namespace SerialPortPrint
         /// <summary>
         /// 打印状态回调
         /// </summary>
-        public Action<PrintState> PrintCallback;
+        public Action<PrintError> PrintCallback;
 
         /// <summary>
         /// 端口是否已经打开
@@ -89,11 +89,11 @@ namespace SerialPortPrint
 
             int result = s.ReadChar();
 
-            if (result == (int)PrintState.Normal)
+            if (result == (int)PrintError.Normal)
             {
                 if (PrintCallback != null)
                 {
-                    PrintCallback(PrintState.Normal);
+                    PrintCallback(PrintError.Normal);
                     //打印数据
                     while (PrintQueue.QueueList.Count() > 0)
                     {
@@ -103,18 +103,18 @@ namespace SerialPortPrint
                     }
                 }
             }
-            else if (result == (int)PrintState.Nopaper)
+            else if (result == (int)PrintError.Nopaper)
             {
                 if (PrintCallback != null)
                 {
-                    PrintCallback(PrintState.Nopaper);
+                    PrintCallback(PrintError.Nopaper);
                 }
             }
             else
             {
                 if (PrintCallback != null)
                 {
-                    PrintCallback(PrintState.Error);
+                    PrintCallback(PrintError.Error);
                 }
             }
         }
@@ -234,7 +234,7 @@ namespace SerialPortPrint
                 byte[] cmdData = new byte[data.Length + 6];
                 cmdData[0] = 0x1B;
                 cmdData[1] = 0x2A;
-                cmdData[2] = 0x32;
+                cmdData[2] = 0x33;
                 cmdData[3] = 0x20;
                 cmdData[4] = 0x2;
                 cmdData[5] = 0x50;
