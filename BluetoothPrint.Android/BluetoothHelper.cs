@@ -91,14 +91,22 @@ namespace BluetoothPrint.droid
         /// <returns></returns>
         public int IsOpen()
         {
+            
             int err = 0;
-            if (this.bluetoothAdapter.IsEnabled)
+            try
+            {
+                if (this.bluetoothAdapter.IsEnabled)
+                {
+                    err = 1;
+                }
+                else
+                {
+                    err = (int)PrintError.NotOpenBluetooth;
+                }
+            }
+            catch
             {
                 err = (int)PrintError.NotSupportBluetooth;
-            }
-            else
-            {
-                err = 1;
             }
             return err;
         }

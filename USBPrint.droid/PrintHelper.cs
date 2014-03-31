@@ -55,9 +55,9 @@ namespace USBPrint.droid
         public int IsOpen()
         {
             int err = 0;
-            if (myDeviceConnection != null)
+            if (myDeviceConnection == null)
             {
-                err = (int)PrintError.Error;
+                err = (int)PrintError.ConnectedFailure;
                 return err;
             }
             else
@@ -188,6 +188,24 @@ namespace USBPrint.droid
             }
             return err;
         }
+        /// <summary>
+        /// 请求打印机状态
+        /// </summary>
+        /// <returns></returns>
+        public int PrinterState()
+        {
+            int err = 0;
+            byte[] cmdData = PrintCommand.RequestPrinterState();
+            if (sendCommand(cmdData)==1)
+            {
+                err = 1;
+            }
+            else
+            {
+                err = (int)PrintError.SendFailure;
+            }
+            return err;
+        }
 
         /**
   * 分配端点，IN | OUT，即输入输出；此处我直接用1为OUT端点，0为IN，当然你也可以通过判断
@@ -217,7 +235,7 @@ namespace USBPrint.droid
                         {
                             epOut = point;
                         }
-                        else
+                        else //if (point.Direction == UsbAddressing.In)
                         {
                             epIn = point;
                         }
@@ -372,6 +390,33 @@ namespace USBPrint.droid
                 }
             }
             return true;
+        }
+
+        private int sendCommand(byte[] command) {
+            int err = 0;
+            if (myDeviceConnection == null)
+            {
+                err = (int)PrintError.ConnectedFailure;
+                return err;
+            }
+            int len = command.Length;
+            int res = myDeviceConnection.BulkTransfer(epOut, command, len, 10000);
+            if (res != len)
+            {
+                err = (int)PrintError.SendFailure;
+                return err;
+            }
+            byte[] reState = new byte[1] ;
+            int ret = myDeviceConnection.BulkTransfer(epIn, reState, 1, 10000);
+            if (ret != 13)
+            {
+                
+            }
+
+
+            return err;
+            
+
         }
 
     }

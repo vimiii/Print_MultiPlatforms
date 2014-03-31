@@ -37,7 +37,7 @@ namespace Test.USBPrint.Win
             {
                 if (print.Open()==1)
                 {
-                    if (print.PrintImg(bitmap,576)==1)
+                    if (print.PrintImg(bitmap,384)==1)
                     {
 
                     }
@@ -53,7 +53,7 @@ namespace Test.USBPrint.Win
             }
             else
             {
-                if (print.PrintImg(bitmap,576)==1)
+                if (print.PrintImg(bitmap,384)==1)
                 {
 
                 }
@@ -72,6 +72,7 @@ namespace Test.USBPrint.Win
             {
                 if (print.Open()==1)
                 {
+                    print.PrinterState();
                     if (print.PrintString(str)==1)
                     {
 

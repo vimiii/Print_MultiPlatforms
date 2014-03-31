@@ -57,13 +57,19 @@ namespace PrintBase
 
             Bitmap rszBitmap = resizeImage(mBitmap, width, height);
             */
+
+
             byte[] src = bitmapToBWPix(rszBitmap);
-            byte[] data = pixToCmd(src, width, nMode);
+            //byte[] data = pixToCmd(src, width, nMode);
+
+
+            byte[] testdata = bitmap2PrinterBytes(src, width);
 
             rszBitmap.Dispose();
             rszBitmap = null;
 
-            return data;
+            return testdata;
+            //return data;
 
         }
 
@@ -183,7 +189,7 @@ namespace PrintBase
             {
                 for (int x = 0; x < xsize; x++)
                 {
-                    if ((orgpixels[k] & 0xFF)> Floyd16x16[(x & 0xF)][(y & 0xF)])
+                    if ((orgpixels[k] & 0xFF) > Floyd16x16[(x & 0xF)][(y & 0xF)])
                         despixels[k] = 0;
                     else
                     {
@@ -197,6 +203,7 @@ namespace PrintBase
         private static byte[] pixToCmd(byte[] src, int nWidth, int nMode)
         {
             int nHeight = src.Length / nWidth;
+
             byte[] data = new byte[8 + src.Length / 8];
             data[0] = 29;
             data[1] = 118;
@@ -206,8 +213,10 @@ namespace PrintBase
             data[5] = (byte)(nWidth / 8 / 256);
             data[6] = (byte)(nHeight % 256);
             data[7] = (byte)(nHeight / 256);
+
+
             int k = 0;
-            for (int i = 8; i < data.Length; i++)
+            for (int i = 2; i < data.Length; i++)
             {
                 data[i] =
                   (byte)(p0[src[k]] + p1[src[(k + 1)]] + p2[src[(k + 2)]] +
@@ -217,6 +226,115 @@ namespace PrintBase
             }
             return data;
         }
+
+
+        /// <summary>
+        /// 斯普瑞特打印机数据转命令
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="nWidth"></param>
+        /// <returns></returns>
+        public static byte[] bitmap2PrinterBytes(byte[] src, int nWidth)
+        {
+            int width = nWidth;
+            int height = src.Length / nWidth;
+            byte[] data = src;
+            byte[] imgbufmy = new byte[(width / 8 + 4) * height];
+
+            Parallel.For(0, height, (y) =>
+            {
+                int ms;
+                if (y == 0)
+                {
+                    ms = 0;
+                }
+                else
+                {
+                    ms = y * (nWidth / 8 + 4);
+                }
+
+                imgbufmy[ms] = 22;
+
+                imgbufmy[(++ms)] = ((byte)(width / 8));
+
+                for (int x = 0; x < width / 8; x++)
+                {
+                    int value;
+                    int k;
+
+                    k = y * width + x * 8;
+                    value = (p0[data[k]] + p1[data[(k + 1)]] + p2[data[(k + 2)]] +
+              p3[data[(k + 3)]] + p4[data[(k + 4)]] + p5[data[(k + 5)]] +
+              p6[data[(k + 6)]] + data[(k + 7)]);
+                    imgbufmy[(++ms)] = ((byte)value);
+                }
+
+                imgbufmy[(++ms)] = 21;
+                imgbufmy[(++ms)] = 1;
+            });
+
+
+
+
+            return imgbufmy;
+
+            #region old
+            /*
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width / 8; x++)
+                {
+                    for (int m = 0; m < 8; m++)
+                    {
+#if ANDROID
+                        if (bitmap.GetPixel(x * 8 + m, y) == -1)
+                            p[m] = 0;
+                        else
+                        {
+                            p[m] = 1;
+                        }
+#else
+if (bitmap.GetPixel(x * 8 + m, y).ToArgb() == -1)
+                            p[m] = 0;
+                        else
+                        {
+                            p[m] = 1;
+                        }
+#endif
+
+                    }
+
+                    int value = p[0] * 128 + p[1] * 64 + p[2] * 32 + p[3] * 16 + p[4] * 8 +
+                      p[5] * 4 + p[6] * 2 + p[7];
+                    bitbuf[x] = ((byte)value);
+                }
+
+                if (y != 0)
+                    imgbuf[(++s)] = 22;
+                else
+                {
+                    imgbuf[s] = 22;
+                }
+                imgbuf[(++s)] = ((byte)(width / 8 + left));
+
+                for (int j = 0; j < left; j++)
+                {
+                    imgbuf[(++s)] = 0;
+                }
+
+                for (int n = 0; n < width / 8; n++)
+                {
+                    imgbuf[(++s)] = bitbuf[n];
+                }
+                imgbuf[(++s)] = 21;
+                imgbuf[(++s)] = 1;
+            }
+
+            return imgbuf;
+             * */
+            #endregion
+        }
+
 
 
         private static int[][] Floyd16x16 = {

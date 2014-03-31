@@ -58,7 +58,12 @@ namespace Test.USBPrint.droid
                 if (helper.Inite(this, Convert.ToInt32(vid.Text), Convert.ToInt32(pid.Text))==1)
                 {
                     helper.Open();
-                }   
+                }
+                //请求打印机状态
+
+                helper.PrinterState();
+   
+
                 Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("T.png"));
                 var res= helper.PrintImg(bm,384);
                 if (res == 1)

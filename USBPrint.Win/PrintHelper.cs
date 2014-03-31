@@ -150,7 +150,7 @@ namespace USBPrint.Win
                     err = (int)PrintError.SendFailure;
                     return err;
                 }
-                /*
+                
                 byte[] readBuffer = new byte[1024];
                 while (ec == ErrorCode.None)
                 {
@@ -162,7 +162,7 @@ namespace USBPrint.Win
 
                     if (bytesRead == 0) { }
                 }
-                */
+                
                 err = 1;
                 return err;
             }
@@ -188,8 +188,8 @@ namespace USBPrint.Win
                 try
                 {
                     byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
-
-                    byte[] cmdData = new byte[data.Length + 6];
+                    /*
+                    byte[] cmdData = new byte[data.Length + 5];
                     cmdData[0] = 0x1B;
                     cmdData[1] = 0x2A;
                     cmdData[2] = 0x0;
@@ -199,6 +199,7 @@ namespace USBPrint.Win
                     {
                         cmdData[6 + i] = data[i];
                     }
+                    */
                     int bytesWritten;
                     ec = Writer.Write(data, 10000, out bytesWritten);
                     if (ec != ErrorCode.None)
@@ -286,6 +287,40 @@ namespace USBPrint.Win
             err = 1;
             return err;
         }
+
+        /// <summary>
+        /// 请求打印机状态
+        /// </summary>
+        /// <returns></returns>
+        public int PrinterState()
+        {
+            int err = 0;
+            ErrorCode ec = ErrorCode.None;
+            byte[] cmdData = PrintCommand.RequestPrinterState();
+            int bytesWritten;
+            ec = Writer.Write(cmdData, 2000, out bytesWritten);
+            if (ec != ErrorCode.None)
+            {
+                err = (int)PrintError.SendFailure;
+                return err;
+            }
+            else if (bytesWritten != cmdData.Length)
+            {
+                err = (int)PrintError.SendFailure;
+                return err;
+            }
+            //读取数据
+            byte[] readbyte = new byte[1];
+            int readLength;
+            
+            ErrorCode rec= Reader.Read(readbyte, 2000, out readLength );
+
+
+            err = 1;
+            return err;
+
+        }
+
 
         private int ChooseEndpoint(UsbDevice UsbDevice)
         { 
