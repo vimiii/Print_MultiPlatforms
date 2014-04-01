@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerialPortPrint", "SerialPortPrint\SerialPortPrint.csproj", "{149ECB07-AD71-4204-96BC-7D4B3A9CFD33}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{822C2FBE-87E7-477E-9B1D-162375679B7A}"
@@ -22,6 +24,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USBPrint.Win", "USBPrint.Win\USBPrint.Win.csproj", "{301D49C3-1FC1-4F8C-9361-CC104D5AE385}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USBPrint.droid", "USBPrint.droid\USBPrint.droid.csproj", "{F6C1AADB-03ED-4A20-AE52-B931BF294D98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkPrint.Win", "NetworkPrint.Win\NetworkPrint.Win.csproj", "{9B93E65B-F7FF-4138-8F3D-1495F7BFC8FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.NetworkPrint.Win", "Test.NetworkPrint.Win\Test.NetworkPrint.Win.csproj", "{F230ABAF-82FA-41C0-9268-04208416A03D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkPrint.Android", "NetworkPrint.Android\NetworkPrint.Android.csproj", "{324FE091-4F2C-43F1-A0DD-79F20CFDC65F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +81,18 @@ Global
 		{F6C1AADB-03ED-4A20-AE52-B931BF294D98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6C1AADB-03ED-4A20-AE52-B931BF294D98}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6C1AADB-03ED-4A20-AE52-B931BF294D98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B93E65B-F7FF-4138-8F3D-1495F7BFC8FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B93E65B-F7FF-4138-8F3D-1495F7BFC8FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B93E65B-F7FF-4138-8F3D-1495F7BFC8FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B93E65B-F7FF-4138-8F3D-1495F7BFC8FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F230ABAF-82FA-41C0-9268-04208416A03D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F230ABAF-82FA-41C0-9268-04208416A03D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F230ABAF-82FA-41C0-9268-04208416A03D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F230ABAF-82FA-41C0-9268-04208416A03D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{324FE091-4F2C-43F1-A0DD-79F20CFDC65F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{324FE091-4F2C-43F1-A0DD-79F20CFDC65F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{324FE091-4F2C-43F1-A0DD-79F20CFDC65F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{324FE091-4F2C-43F1-A0DD-79F20CFDC65F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,5 +103,6 @@ Global
 		{D8EB6348-1CBB-4A84-9EEE-6651668755AB} = {822C2FBE-87E7-477E-9B1D-162375679B7A}
 		{75D1E6F9-0F13-4C44-900B-F9C1F2E98913} = {822C2FBE-87E7-477E-9B1D-162375679B7A}
 		{95112FBF-ECE7-43BD-9329-BD04E31D75CA} = {822C2FBE-87E7-477E-9B1D-162375679B7A}
+		{F230ABAF-82FA-41C0-9268-04208416A03D} = {822C2FBE-87E7-477E-9B1D-162375679B7A}
 	EndGlobalSection
 EndGlobal
