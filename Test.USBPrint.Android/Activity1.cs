@@ -64,8 +64,8 @@ namespace Test.USBPrint.droid
                 helper.PrinterState();
    
 
-                Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("T.png"));
-                var res= helper.PrintImg(bm,384);
+                Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("tt1.jpg"));
+                var res= helper.PrintImg(bm,384,0);
                 if (res == 1)
                 {
                    res= helper.WalkPaper(6);

@@ -55,6 +55,7 @@
       <Link>PrintError.cs</Link>
     </Compile>
     <Compile Include="BluetoothHelper.cs" />
+    <Compile Include="PrinterType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

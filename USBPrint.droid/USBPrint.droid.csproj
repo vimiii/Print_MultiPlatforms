@@ -52,6 +52,9 @@
     <Compile Include="..\SerialPortPrint\PrintError.cs">
       <Link>PrintError.cs</Link>
     </Compile>
+    <Compile Include="..\SerialPortPrint\PrinterType.cs">
+      <Link>PrinterType.cs</Link>
+    </Compile>
     <Compile Include="PrintHelper.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

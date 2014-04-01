@@ -42,6 +42,7 @@
     <Compile Include="Log.cs" />
     <Compile Include="Pos.cs" />
     <Compile Include="PrintCommand.cs" />
+    <Compile Include="PrinterType.cs" />
     <Compile Include="PrintHelper.cs" />
     <Compile Include="PrintQueue.cs" />
     <Compile Include="PrintError.cs" />

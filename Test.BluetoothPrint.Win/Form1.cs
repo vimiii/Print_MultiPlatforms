@@ -44,7 +44,7 @@ namespace Test.BluetoothPrint.Win
         private void button2_Click(object sender, EventArgs e)
         {
             Bitmap bitmap = new Bitmap("Test.png");
-            byte[] data = Pos.POS_PrintPicture(bitmap, 384, 0);
+            byte[] data = Pos.POS_PrintPicture(bitmap, 384, 0,SerialPortPrint.PrinterType.DP);
             blueClient.Client.Send(data).ToString();
          
         }

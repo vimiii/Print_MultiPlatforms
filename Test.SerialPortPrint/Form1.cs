@@ -54,7 +54,7 @@ namespace Test.SerialPortPrint
             string mes = "";
             string imgPath = "img/Test.png";
             Bitmap bitmap = new Bitmap(imgPath);
-            if (!print1.PrintImg(bitmap, out mes)) {
+            if (!print1.PrintImg(bitmap,PrinterType.DP, out mes)) {
                 MessageBox.Show(mes);
             }
         }

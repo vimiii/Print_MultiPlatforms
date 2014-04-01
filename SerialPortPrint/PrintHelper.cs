@@ -214,7 +214,7 @@ namespace SerialPortPrint
         /// <param name="bitmap"></param>
         /// <param name="err"></param>
         /// <returns></returns>
-        public bool PrintImg(Bitmap bitmap, out string err)
+        public bool PrintImg(Bitmap bitmap,PrinterType pt, out string err)
         {
             err = "";
             if (!isPrintOk)
@@ -230,7 +230,7 @@ namespace SerialPortPrint
             }
             try
             {
-                byte[] data = Pos.POS_PrintPicture(bitmap, 384, 0);
+                byte[] data = Pos.POS_PrintPicture(bitmap, 384, 0,pt);
                 byte[] cmdData = new byte[data.Length + 6];
                 cmdData[0] = 0x1B;
                 cmdData[1] = 0x2A;

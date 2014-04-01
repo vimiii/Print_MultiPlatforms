@@ -17,8 +17,13 @@ namespace Test.NetworkPrint.Win
             print.Connect();
 
             int error;
-            Bitmap bitmap = (Bitmap)Bitmap.FromFile("tesddt.jpg");
-            print.PrintImg(bitmap, out error);
+            //Bitmap bitmap = (Bitmap)Bitmap.FromFile("tesddt.jpg");
+            //print.PrintImg(bitmap, out error,0);
+
+            print.BeginReceive();
+            print.StartStateReturn();
+
+            print.PrintString("hello world!");
             
 
            // tcp.Connect("192.168.0.123", 9100);

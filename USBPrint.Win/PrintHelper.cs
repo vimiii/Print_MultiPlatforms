@@ -179,7 +179,7 @@ namespace USBPrint.Win
         /// </summary>
         /// <param name="bitmap"></param>
         /// <returns></returns>
-        public int PrintImg(Bitmap bitmap, int dpiWidth)
+        public int PrintImg(Bitmap bitmap, int dpiWidth,int pt)
         {
             int err = 0;
             ErrorCode ec = ErrorCode.None;
@@ -187,7 +187,7 @@ namespace USBPrint.Win
             {
                 try
                 {
-                    byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
+                    byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0, (PrinterType)pt);
                     /*
                     byte[] cmdData = new byte[data.Length + 5];
                     cmdData[0] = 0x1B;

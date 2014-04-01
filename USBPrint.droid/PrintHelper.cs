@@ -124,7 +124,7 @@ namespace USBPrint.droid
         /// </summary>
         /// <param name="bitmap"></param>
         /// <returns></returns>
-        public int PrintImg(Bitmap bitmap, int dpiWidth)
+        public int PrintImg(Bitmap bitmap, int dpiWidth,int pt)
         {
             int err = 0;
 
@@ -132,14 +132,21 @@ namespace USBPrint.droid
             {
                 try
                 {
-                    byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
-                    if (sendPackage(data))
+                    byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0, (PrinterType)pt);
+                    if (data != null)
                     {
-                        err = 1;
+                        if (sendPackage(data))
+                        {
+                            err = 1;
+                        }
+                        else
+                        {
+                            err = (int)PrintError.SendFailure;
+                        }
                     }
                     else
                     {
-                        err = (int)PrintError.SendFailure;
+                        err = (int)PrintError.PosCMDErr;
                     }
                 }
                 catch

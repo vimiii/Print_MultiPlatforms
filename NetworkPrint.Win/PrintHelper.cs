@@ -9,6 +9,7 @@ using System.Text;
 #else
 using System.Drawing;
 using PrintBase;
+using SerialPortPrint;
 #endif
 
 namespace NetworkPrint.Win
@@ -39,7 +40,7 @@ namespace NetworkPrint.Win
                 return false;
             }
         }
-        
+
         public bool IsOpen()
         {
             if (tcp != null)
@@ -52,16 +53,38 @@ namespace NetworkPrint.Win
             }
         }
 
+        public int StartStateReturn()
+        {
+            int error = 0;
+            if (tcp.Client.Connected)
+            {
+                byte[] data = PrintCommand.StateReturn();
+
+                try
+                {
+                    tcp.Client.Send(data);
+                    error = 0;
+
+                }
+                catch (Exception ex)
+                {
+                    error = 2;
+
+                }
+            }
+            return error;
+        }
+
         /// <summary>
         /// 打印图片
         /// </summary>
         /// <param name="bitmap"></param>
         /// <returns></returns>
-        public bool PrintImg(Bitmap bitmap, out int error)
+        public bool PrintImg(Bitmap bitmap, out int error, int pt)
         {
             if (tcp.Client.Connected)
             {
-                byte[] data = Pos.POS_PrintPicture(bitmap, 567, 0);
+                byte[] data = Pos.POS_PrintPicture(bitmap, 567, 0, (PrinterType)pt);
 
                 try
                 {
@@ -81,7 +104,41 @@ namespace NetworkPrint.Win
             return false;
 
         }
+        /// <summary>
+        /// 打印文本
+        /// </summary>
+        /// <param name="mess"></param>
+        /// <returns></returns>
+        public int PrintString(string mess)
+        {
+            int error = 0;
+            byte[] OutBuffer;//数据
+            int BufferSize;
+            Encoding targetEncoding;
+            //将[UNICODE编码]转换为[GB码]，仅使用于简体中文版mobile
+            targetEncoding = Encoding.GetEncoding(0);    //得到简体中文字码页的编码方式，因为是简体中文操作系统，参数用0就可以，用936也行。
+            BufferSize = targetEncoding.GetByteCount(mess); //计算对指定字符数组中的所有字符进行编码所产生的字节数           
+            OutBuffer = new byte[BufferSize];
+            OutBuffer = targetEncoding.GetBytes(mess);       //将指定字符数组中的所有字符编码为一个字节序列,完成后outbufer里面即为简体中文编码
 
+            if (tcp.Client.Connected)
+            {
+                byte[] data = OutBuffer;
+
+                try
+                {
+                    tcp.Client.Send(data);
+                    error = 0;
+
+                }
+                catch (Exception ex)
+                {
+                    error = 2;
+
+                }
+            }
+            return error;
+        }
         /// <summary>
         ///切纸
         /// </summary>
@@ -101,14 +158,14 @@ namespace NetworkPrint.Win
                 tcp.Client.Send(cmdData);
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return false;
             }
         }
-        
 
-        private void BeginReceive()
+
+        public void BeginReceive()
         {
             byte[] data = new byte[1024];
             tcp.Client.BeginReceive(data, 0, data.Length, SocketFlags.None, out socketError, BeginReceiveCallBack, data);
@@ -144,4 +201,3 @@ namespace NetworkPrint.Win
         }
     }
 }
- 

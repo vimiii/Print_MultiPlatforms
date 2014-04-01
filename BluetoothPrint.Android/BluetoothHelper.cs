@@ -208,7 +208,7 @@ namespace BluetoothPrint.droid
        /// <param name="bitmap">图片</param>
        /// <param name="err">2:没有开启蓝牙，3：没有连接打印机，4：butmap为null,5:程序出现异常</param>
        /// <returns></returns>
-        public int SendImg(Bitmap bitmap,int dpiWidth)
+        public int SendImg(Bitmap bitmap,int dpiWidth,int pt)
         {
             int err = 0;
             if (!isopen)
@@ -230,7 +230,7 @@ namespace BluetoothPrint.droid
 
             try
             {
-                byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
+                byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0, (PrinterType)pt);
                 byte[] cmdData = new byte[data.Length + 6];
                 cmdData[0] = 0x1B;
                 cmdData[1] = 0x2A;

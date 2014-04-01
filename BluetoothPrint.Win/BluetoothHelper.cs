@@ -153,12 +153,12 @@ namespace BluetoothPrint.Win
         /// </summary>
         /// <param name="bitmap"></param>
         /// <returns></returns>
-        public int PrintImg(Bitmap bitmap, int dpiWidth)
+        public int PrintImg(Bitmap bitmap, int dpiWidth,int pt)
         {
             int err = 0;
             if (blueClient.Connected)
             {
-                byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0);
+                byte[] data = Pos.POS_PrintPicture(bitmap, dpiWidth, 0, (PrinterType)pt);
                 int res= blueClient.Client.Send(data);
                 if (res == data.Length)
                 {

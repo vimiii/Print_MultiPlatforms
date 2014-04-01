@@ -52,6 +52,7 @@
     </Compile>
     <Compile Include="BluetoothHelper.cs" />
     <Compile Include="BluetoothService.cs" />
+    <Compile Include="PrinterType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StopBits.cs" />
   </ItemGroup>

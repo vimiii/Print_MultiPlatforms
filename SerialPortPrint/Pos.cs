@@ -11,6 +11,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SerialPortPrint;
 
 
 
@@ -28,9 +29,15 @@ namespace PrintBase
         private static int[] p4 = { 0, 8 };
         private static int[] p5 = { 0, 4 };
         private static int[] p6 = { 0, 2 };
-
+        /// <summary>
+        /// dp打印机获取打印命令
+        /// </summary>
+        /// <param name="mBitmap"></param>
+        /// <param name="nWidth"></param>
+        /// <param name="nMode"></param>
+        /// <returns></returns>
         public static byte[] POS_PrintPicture(Bitmap mBitmap, int nWidth,
-            int nMode)
+            int nMode, PrinterType printerType)
         {
             Bitmap rszBitmap;
             int width;
@@ -42,37 +49,27 @@ namespace PrintBase
             else
             {
                 width = (nWidth + 7) / 8 * 8;
-
                 int height = mBitmap.Height * width / mBitmap.Width;
-
-                //Bitmap grayBitmap = toGrayscale(mBitmap);
                 rszBitmap = resizeImage(mBitmap, width, height);
             }
-            /*
-            int width = (nWidth + 7) / 8 * 8;
-
-            int height = mBitmap.Height * width / mBitmap.Width;
-
-            //Bitmap grayBitmap = toGrayscale(mBitmap);
-
-            Bitmap rszBitmap = resizeImage(mBitmap, width, height);
-            */
-
-
             byte[] src = bitmapToBWPix(rszBitmap);
-            //byte[] data = pixToCmd(src, width, nMode);
-
-
-            byte[] testdata = bitmap2PrinterBytes(src, width);
-
-            rszBitmap.Dispose();
-            rszBitmap = null;
-
-            return testdata;
-            //return data;
-
+            byte[] data;
+            if (printerType == PrinterType.DP)
+            {
+                data = pixToCmd(src, width, nMode);
+                rszBitmap.Dispose();
+                rszBitmap = null;
+                return data;
+            }
+            else if (printerType == PrinterType.SPRT)
+            {
+                data = bitmap2PrinterBytes(src, width);
+                rszBitmap.Dispose();
+                rszBitmap = null;
+                return data;
+            }
+            return null;
         }
-
 
         public static Bitmap resizeImage(Bitmap bitmap, int w, int h)
         {
@@ -199,7 +196,13 @@ namespace PrintBase
                 }
             }
         }
-
+        /// <summary>
+        /// dp打印机数据转化
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="nWidth"></param>
+        /// <param name="nMode"></param>
+        /// <returns></returns>
         private static byte[] pixToCmd(byte[] src, int nWidth, int nMode)
         {
             int nHeight = src.Length / nWidth;
@@ -214,9 +217,19 @@ namespace PrintBase
             data[6] = (byte)(nHeight % 256);
             data[7] = (byte)(nHeight / 256);
 
+            /*
+                       byte[] data = new byte[5+ src.Length / 8];
+                       data[0] = 27;
+                       data[1] = 42;
+                       data[2] = 1;
+                       data[3] = (byte)(nWidth / 8 % 256);
+                       data[4] = (byte)(nWidth / 8 / 256);
+
+            */
+
 
             int k = 0;
-            for (int i = 2; i < data.Length; i++)
+            for (int i = 8; i < data.Length; i++)
             {
                 data[i] =
                   (byte)(p0[src[k]] + p1[src[(k + 1)]] + p2[src[(k + 2)]] +
@@ -224,12 +237,13 @@ namespace PrintBase
                   p6[src[(k + 6)]] + src[(k + 7)]);
                 k += 8;
             }
+
             return data;
         }
 
 
         /// <summary>
-        /// 斯普瑞特打印机数据转命令
+        /// 斯普瑞特打印机数据转化
         /// </summary>
         /// <param name="src"></param>
         /// <param name="nWidth"></param>
@@ -240,6 +254,7 @@ namespace PrintBase
             int height = src.Length / nWidth;
             byte[] data = src;
             byte[] imgbufmy = new byte[(width / 8 + 4) * height];
+
 
             Parallel.For(0, height, (y) =>
             {
@@ -274,8 +289,39 @@ namespace PrintBase
             });
 
 
+            /*
+            for (int y = 0; y < height; y++)
+            {
+                int ms;
+                if (y == 0)
+                {
+                    ms = 0;
+                }
+                else
+                {
+                    ms = y * (nWidth / 8 + 4);
+                }
 
+                imgbufmy[ms] = 22;
 
+                imgbufmy[(++ms)] = ((byte)(width / 8));
+
+                for (int x = 0; x < width / 8; x++)
+                {
+                    int value;
+                    int k;
+
+                    k = y * width + x * 8;
+                    value = (p0[data[k]] + p1[data[(k + 1)]] + p2[data[(k + 2)]] +
+              p3[data[(k + 3)]] + p4[data[(k + 4)]] + p5[data[(k + 5)]] +
+              p6[data[(k + 6)]] + data[(k + 7)]);
+                    imgbufmy[(++ms)] = ((byte)value);
+                }
+
+                imgbufmy[(++ms)] = 21;
+                imgbufmy[(++ms)] = 1;
+            }
+            */
             return imgbufmy;
 
             #region old
