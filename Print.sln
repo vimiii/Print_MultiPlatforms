@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerialPortPrint", "SerialPortPrint\SerialPortPrint.csproj", "{149ECB07-AD71-4204-96BC-7D4B3A9CFD33}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{822C2FBE-87E7-477E-9B1D-162375679B7A}"
@@ -30,6 +28,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.NetworkPrint.Win", "Test.NetworkPrint.Win\Test.NetworkPrint.Win.csproj", "{F230ABAF-82FA-41C0-9268-04208416A03D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkPrint.Android", "NetworkPrint.Android\NetworkPrint.Android.csproj", "{324FE091-4F2C-43F1-A0DD-79F20CFDC65F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PreventLostCenter", "PreventLostCenter\PreventLostCenter.csproj", "{157B4E8D-36BB-405B-B47F-8EBAD9BC42A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +93,10 @@ Global
 		{324FE091-4F2C-43F1-A0DD-79F20CFDC65F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{324FE091-4F2C-43F1-A0DD-79F20CFDC65F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{324FE091-4F2C-43F1-A0DD-79F20CFDC65F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{157B4E8D-36BB-405B-B47F-8EBAD9BC42A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{157B4E8D-36BB-405B-B47F-8EBAD9BC42A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{157B4E8D-36BB-405B-B47F-8EBAD9BC42A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{157B4E8D-36BB-405B-B47F-8EBAD9BC42A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

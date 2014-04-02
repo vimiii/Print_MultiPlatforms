@@ -10,6 +10,9 @@ using System.Text;
 using System.Drawing;
 using PrintBase;
 using SerialPortPrint;
+using PreventLostCenter;
+using System.IO;
+using System.Threading.Tasks;
 #endif
 
 namespace NetworkPrint.Win
@@ -17,28 +20,36 @@ namespace NetworkPrint.Win
     public class PrintHelper
     {
         private SocketError socketError;
+        private int Sendport = 9100;
         private TcpClient tcp;
-        private int port;
         private string ip;
+        private PrintStateMachine printStateMachine;
 
-        public PrintHelper(string ip, int port)
+        public PrintHelper(string ip)
         {
             this.ip = ip;
-            this.port = port;
-            tcp = new TcpClient();
+            printStateMachine = new PrintStateMachine();
         }
 
         public bool Connect()
         {
             try
             {
-                tcp.Connect(ip, port);
+                tcp = new TcpClient();
+                tcp.Connect(ip, Sendport);
                 return true;
             }
             catch (Exception ex)
             {
                 return false;
             }
+        }
+
+        public bool Close()
+        {
+            tcp.Close();
+            tcp = null;
+            return true;
         }
 
         public bool IsOpen()
@@ -53,12 +64,12 @@ namespace NetworkPrint.Win
             }
         }
 
-        public int StartStateReturn()
+        public int StartPreventLost()
         {
             int error = 0;
             if (tcp.Client.Connected)
             {
-                byte[] data = PrintCommand.StateReturn();
+                byte[] data = PrintCommand.StartPreventLost();
 
                 try
                 {
@@ -74,6 +85,143 @@ namespace NetworkPrint.Win
             }
             return error;
         }
+
+        public int StartStateReturn()
+        {
+            int error = 0;
+            if (tcp.Client.Connected)
+            {
+                byte[] data = PrintCommand.StateReturn();
+
+                try
+                {
+                    tcp.Client.Send(data);
+                    //retcp.Client.Send(data);
+                    error = 0;
+
+                }
+                catch (Exception ex)
+                {
+                    error = 2;
+
+                }
+            }
+            return error;
+        }
+        public int GetState()
+        {
+            int error = 0;
+            if (tcp.Client.Connected)
+            {
+                byte[] data = PrintCommand.GetState();
+
+                try
+                {
+                    tcp.Client.Send(data);
+                    //retcp.Client.Send(data);
+                    error = 0;
+
+                }
+                catch (Exception ex)
+                {
+                    error = 2;
+
+                }
+            }
+            return error;
+        }
+        public int PrinterInite()
+        {
+            int error = 0;
+            if (tcp.Client.Connected)
+            {
+                byte[] data = PrintCommand.Inite();
+
+                try
+                {
+                    tcp.Client.Send(data);
+                    error = 0;
+
+                }
+                catch (Exception ex)
+                {
+                    error = 2;
+
+                }
+            }
+            return error;
+        }
+        public int ClearState()
+        {
+            int error = 0;
+            if (tcp.Client.Connected)
+            {
+                byte[] data = PrintCommand.ClearState();
+
+                try
+                {
+                    tcp.Client.Send(data);
+                    error = 0;
+
+                }
+                catch (Exception ex)
+                {
+                    error = 2;
+
+                }
+            }
+            return error;
+        }
+
+        public void BeginReceive()
+        {
+            byte[] data = new byte[4];
+            tcp.Client.BeginReceive(data, 0, data.Length, SocketFlags.None, out socketError, BeginReceiveCallBack, data);
+        }
+        private void BeginReceiveCallBack(IAsyncResult reault)
+        {
+            int cout = 0;
+            try
+            {
+                cout = tcp.Client.EndReceive(reault);
+            }
+            catch (SocketException e)
+            {
+                socketError = e.SocketErrorCode;
+            }
+            catch
+            {
+                socketError = SocketError.HostDown;
+            }
+            if (socketError == SocketError.Success && cout > 0)
+            {
+                byte[] buffer = reault.AsyncState as byte[];
+                byte[] data = new byte[cout];
+                Array.Copy(buffer, 0, data, 0, data.Length);
+                PreventLostContext context = new PreventLostContext(data, printStateMachine);
+                context.Tactic();
+
+                if (printStateMachine.State == 10)
+                {
+                   
+                    PrinterInite();
+                    //printStateMachine.State = 1;
+                }
+                if (printStateMachine.State == 11)
+                {
+                     ClearState();
+                }
+
+                BeginReceive();
+
+            }
+            else
+            {
+                tcp.Client.Close();
+            }
+        }
+
+
 
         /// <summary>
         /// 打印图片
@@ -107,7 +255,7 @@ namespace NetworkPrint.Win
         /// <summary>
         /// 打印文本
         /// </summary>
-        /// <param name="mess"></param>
+        /// <param name="mess"></param> 
         /// <returns></returns>
         public int PrintString(string mess)
         {
@@ -128,6 +276,7 @@ namespace NetworkPrint.Win
                 try
                 {
                     tcp.Client.Send(data);
+                    CutPage();
                     error = 0;
 
                 }
@@ -164,40 +313,5 @@ namespace NetworkPrint.Win
             }
         }
 
-
-        public void BeginReceive()
-        {
-            byte[] data = new byte[1024];
-            tcp.Client.BeginReceive(data, 0, data.Length, SocketFlags.None, out socketError, BeginReceiveCallBack, data);
-
-        }
-
-        private void BeginReceiveCallBack(IAsyncResult reault)
-        {
-            int cout = 0;
-            try
-            {
-                cout = tcp.Client.EndReceive(reault);
-            }
-            catch (SocketException e)
-            {
-                socketError = e.SocketErrorCode;
-            }
-            catch
-            {
-                socketError = SocketError.HostDown;
-            }
-            if (socketError == SocketError.Success && cout > 0)
-            {
-                byte[] buffer = reault.AsyncState as byte[];
-                byte[] data = new byte[cout];
-                Array.Copy(buffer, 0, data, 0, data.Length);
-                BeginReceive();
-            }
-            else
-            {
-                tcp.Client.Close();
-            }
-        }
     }
 }

@@ -13,17 +13,22 @@ namespace Test.NetworkPrint.Win
     {
         static void Main(string[] args)
         {
-            PrintHelper print = new PrintHelper("192.168.0.123", 9100);
+            /*
+            PrintHelper print = new PrintHelper("192.168.0.123");
             print.Connect();
 
-            int error;
+            //int error;
             //Bitmap bitmap = (Bitmap)Bitmap.FromFile("tesddt.jpg");
             //print.PrintImg(bitmap, out error,0);
-
+            print.StartPreventLost();
+            print.PrinterInite();
             print.BeginReceive();
             print.StartStateReturn();
-
-            print.PrintString("hello world!");
+           
+           // print.PrintString("hello world111111111111111111111111111111111111!");
+            
+            */
+            new Form1().ShowDialog();
             
 
            // tcp.Connect("192.168.0.123", 9100);

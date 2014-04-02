@@ -52,6 +52,12 @@
     <Compile Include="PrintHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PreventLostCenter\PreventLostCenter.csproj">
+      <Project>{157b4e8d-36bb-405b-b47f-8ebad9bc42a4}</Project>
+      <Name>PreventLostCenter</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
