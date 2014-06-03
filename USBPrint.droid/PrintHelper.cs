@@ -72,6 +72,7 @@ namespace USBPrint.droid
             err= openDevice();
             return err;
         }
+       
         /// <summary>
         /// 释放连接
         /// </summary>
@@ -161,6 +162,24 @@ namespace USBPrint.droid
             return err;
         }
         /// <summary>
+        /// 换行
+        /// </summary>
+        /// <returns></returns>
+        public int CRLF()
+        {
+            int err = 0;
+            byte[] cmdData = PrintCommand.CRLF();
+            if (sendPackage(cmdData))
+            {
+                err = 1;
+            }
+            else
+            {
+                err = (int)PrintError.SendFailure;
+            }
+            return err;
+        }
+        /// <summary>
         ///切纸
         /// </summary>
         public int CutPage()
@@ -185,6 +204,21 @@ namespace USBPrint.droid
         {
             int err = 0;
             byte[] cmdData = PrintCommand.WalkPaper(row);
+            if (sendPackage(cmdData))
+            {
+                err = 1;
+            }
+            else
+            {
+                err = (int)PrintError.SendFailure;
+            }
+            return err;
+        }
+      
+        public int Reset()
+        {
+            int err = 0;
+            byte[] cmdData = PrintCommand.Reset();
             if (sendPackage(cmdData))
             {
                 err = 1;
@@ -370,7 +404,7 @@ namespace USBPrint.droid
             int len = command.Length;
 
             //分批发送
-            int packageLength = 1000;
+            int packageLength = 5000;
             Dictionary<int, byte[]> data = new System.Collections.Generic.Dictionary<int, byte[]>();
             int num = len / packageLength + 1;
             for (int i = 0; i < num; i++)
@@ -388,10 +422,11 @@ namespace USBPrint.droid
                 data.Add(i, da);
             }
 
-            foreach (int i in data.Keys)
+            foreach (KeyValuePair<int,byte[]> kvp in data)
             {
-                int res = myDeviceConnection.BulkTransfer(epOut, data[i], data[i].Length, 10000);
-                if (res != data[i].Length)
+                int res = myDeviceConnection.BulkTransfer(epOut, kvp.Value, kvp.Value.Length, 10000);
+                System.Threading.Thread.Sleep(5);
+                if (res != kvp.Value.Length)
                 {
                     return false;
                 }

@@ -43,6 +43,31 @@ namespace SerialPortPrint
             return cmdData;
         }
         /// <summary>
+        /// 换行
+        /// </summary>
+        public static byte[] CRLF()
+        {
+            byte[] cmdData = new byte[2];
+
+            //切纸
+            cmdData[0] = 0x0d;
+            cmdData[1] = 0x0a;
+            return cmdData;
+        }
+        /// <summary>
+        /// 打印机初始化状态
+        /// </summary>
+        /// <returns></returns>
+        public static byte[] Reset()
+        {
+            byte[] cmdData = new byte[3];
+            cmdData[0] = 0x1B;
+            cmdData[1] = 0x41;
+            cmdData[2] = 0x00;
+            return cmdData;
+        }
+
+        /// <summary>
         /// 请求打印机状态
         /// </summary>
         /// <returns></returns>
@@ -50,7 +75,7 @@ namespace SerialPortPrint
         {
             byte[] cmdData = new byte[3];
 
-            //切纸
+
             cmdData[0] = 0x1B;
             cmdData[1] = 0x76;
             cmdData[2] = 0x01;
@@ -92,7 +117,7 @@ namespace SerialPortPrint
             return cmdData;
         }
         /// <summary>
-        /// 打印机状态自动返回
+        /// 主动请求打印机状态
         /// </summary>
         /// <returns></returns>
         public static byte[] GetState()
@@ -110,7 +135,7 @@ namespace SerialPortPrint
         {
             byte[] cmdData = new byte[2];
             cmdData[0] = 0x1B;
-            cmdData[1] = 0x41;
+            cmdData[1] = 0x40;
             return cmdData;
         }
         /// <summary>
@@ -126,7 +151,7 @@ namespace SerialPortPrint
             cmdData[3] = 0x08;
             cmdData[4] = 0x01;
             return cmdData;
-            
+
         }
         #endregion
     }

@@ -50,32 +50,38 @@ namespace Test.USBPrint.droid
             int err = 0;
             vid = FindViewById<EditText>(Resource.Id.vid);
             pid = FindViewById<EditText>(Resource.Id.pid);
-            
+
             //查找USB设备
             button.Click += (o, e) =>
             {
-
-                if (helper.Inite(this, Convert.ToInt32(vid.Text), Convert.ToInt32(pid.Text))==1)
+                err = helper.IsOpen();
+                if (err != 1)
                 {
-                    helper.Open();
+
+
+
+                    if (helper.Inite(this, Convert.ToInt32(1155), Convert.ToInt32(22304)) == 1)
+                    {
+                        helper.Open();
+                    }
+                    //请求打印机状态
+
+                    helper.PrinterState();
                 }
-                //请求打印机状态
 
-                helper.PrinterState();
-   
-
-                Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("tt1.jpg"));
-                var res= helper.PrintImg(bm,384,0);
+                Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("Test4.png"));
+                var res = helper.PrintImg(bm, 576, 1);
                 if (res == 1)
                 {
-                   res= helper.WalkPaper(6);
-                   if (res == 1)
-                   {
-                      res= helper.CutPage();
-                   }
+                    res = helper.WalkPaper(6);
+                    if (res == 1)
+                    {
+                        res = helper.CutPage();
+                    }
                     //Log.Debug("print","打印成功");
                 }
-                else {
+                else
+                {
                     Log.Debug("print", res.ToString());
                 }
             };
@@ -113,7 +119,7 @@ namespace Test.USBPrint.droid
                 }
             }
         }
-        
+
     }
 }
 

@@ -9,8 +9,9 @@ namespace PreventLostCenter
 {
     internal class PreventLostFactary
     {
-        public static PreventLostSuper HandlerFactory(byte[] asb, PrintStateMachine state)
+        public static PreventLostSuper HandlerFactory(byte[] asb)
         {
+            PrintStateMachine state = new PrintStateMachine();
             if (asb == null || asb.Length != 4)
             {
                 return null;
@@ -19,10 +20,6 @@ namespace PreventLostCenter
             byte second = asb[1];
             byte third = asb[2];
             byte forth = asb[3];
-
-
-
-
 
             if ((first & 32) == (byte)32)
             {

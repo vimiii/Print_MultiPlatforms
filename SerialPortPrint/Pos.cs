@@ -255,7 +255,7 @@ namespace PrintBase
             byte[] data = src;
             byte[] imgbufmy = new byte[(width / 8 + 4) * height];
 
-
+            /*
             Parallel.For(0, height, (y) =>
             {
                 int ms;
@@ -287,9 +287,9 @@ namespace PrintBase
                 imgbufmy[(++ms)] = 21;
                 imgbufmy[(++ms)] = 1;
             });
+            */
 
-
-            /*
+            
             for (int y = 0; y < height; y++)
             {
                 int ms;
@@ -321,7 +321,7 @@ namespace PrintBase
                 imgbufmy[(++ms)] = 21;
                 imgbufmy[(++ms)] = 1;
             }
-            */
+            
             return imgbufmy;
 
             #region old

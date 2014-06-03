@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,16 +11,18 @@ namespace PreventLostCenter
     {
         
         PreventLostSuper super;
-        public PreventLostContext(byte[] asb,PrintStateMachine state)
+        public PreventLostContext(byte[] asb)
         {
-            super = PreventLostFactary.HandlerFactory(asb,state);
+            super = PreventLostFactary.HandlerFactory(asb);
         }
-        public void Tactic()
+        public PrinterState Tactic()
         { 
             if(super!=null)
             {
-                super.Handling();
+                return super.Handling();
             }
+            Debug.WriteLine("没有处理该打印机状态");
+            return PrinterState.UnCatchPrinter;
         }
     }
 }

@@ -51,6 +51,9 @@
     </Compile>
     <Compile Include="PrintHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SendTcpClient.cs" />
+    <Compile Include="StateTcpClient.cs" />
+    <Compile Include="TcpClientBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PreventLostCenter\PreventLostCenter.csproj">

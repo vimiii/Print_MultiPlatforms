@@ -16,7 +16,7 @@ namespace Test.NetworkPrint.Win
         public Form1()
         {
             InitializeComponent();
-            print = new PrintHelper("192.168.0.123");
+            print = new PrintHelper("192.168.0.123",null);
             print.Connect();
             print.StartStateReturn();
             print.PrinterInite();

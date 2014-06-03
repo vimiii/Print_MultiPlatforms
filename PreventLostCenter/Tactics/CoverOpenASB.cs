@@ -12,9 +12,10 @@ namespace PreventLostCenter.Tactics
     /// </summary>
     public class CoverOpenASB:PreventLostSuper
     {
-        public override void Handling()
+        public override PrinterState Handling()
         {
             Debug.WriteLine("打印机上盖打开");
+            return PrinterState.CoverOpen;
         }
     }
 }

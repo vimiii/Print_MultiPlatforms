@@ -12,9 +12,10 @@ namespace PreventLostCenter.Tactics
     /// </summary>
     internal class OutOfPaperASB:PreventLostSuper
     {
-        public override void Handling()
+        public override PrinterState Handling()
         {
             Debug.WriteLine("打印机缺纸");
+            return PrinterState.OutOfPaper;
         }
     }
 }

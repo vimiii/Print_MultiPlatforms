@@ -43,6 +43,7 @@
     <Compile Include="PreventLostContext.cs" />
     <Compile Include="PreventLostFactary.cs" />
     <Compile Include="PreventLostSuper.cs" />
+    <Compile Include="PrinterState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PrintStateMachine.cs" />
     <Compile Include="Tactics\CoverOpenASB.cs" />

@@ -8,7 +8,7 @@ namespace PreventLostCenter
     /// <summary>
     /// 打印状态机
     /// </summary>
-    public class PrintStateMachine
+    internal class PrintStateMachine
     {
         /// <summary>
         /// 打印机当前状态(-1：实时清除打印机状态)
@@ -22,5 +22,6 @@ namespace PreventLostCenter
         {
             return State == 1;
         }
+        
     }
 }

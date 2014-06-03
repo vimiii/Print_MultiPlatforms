@@ -200,6 +200,10 @@ namespace USBPrint.Win
                         cmdData[6 + i] = data[i];
                     }
                     */
+
+
+                    sendPackage(data);
+                    /*
                     int bytesWritten;
                     ec = Writer.Write(data, 10000, out bytesWritten);
                     if (ec != ErrorCode.None)
@@ -212,6 +216,7 @@ namespace USBPrint.Win
                         err = (int)PrintError.SendFailure;
                         return err;
                     }
+                     * */
                     err = 1;
                     return err;
                 }
@@ -226,6 +231,76 @@ namespace USBPrint.Win
                 err = (int)PrintError.SendNull;
                 return err;
             }
+        }
+
+        /// <summary>
+        /// 发送数据包
+        /// </summary>
+        /// <param name="command"></param>
+        private bool sendPackage(byte[] command)
+        {
+            int err = 0;
+            ErrorCode ec = ErrorCode.None;
+            int len = command.Length;
+
+            //分批发送
+            int packageLength = 3000;
+            Dictionary<int, byte[]> data = new System.Collections.Generic.Dictionary<int, byte[]>();
+            int num = len / packageLength + 1;
+            for (int i = 0; i < num; i++)
+            {
+                byte[] da = new byte[packageLength];
+                for (int j = 0; j < packageLength; j++)
+                {
+                    int index = i * packageLength + j;
+                    if (index >= len)
+                    {
+                        break;
+                    }
+                    da[j] = command[index];
+                }
+                data.Add(i, da);
+            }
+
+            foreach (KeyValuePair<int, byte[]> kvp in data)
+            {
+                System.Threading.Thread.Sleep(10);
+                int res = 0;
+                int tryCount = 0;
+                //do
+                //{ 
+                //    if (tryCount < 50)
+                //    {
+                //        res = myDeviceConnection.BulkTransfer(epOut, kvp.Value, kvp.Value.Length, 10000);
+                //        tryCount++;
+                //    }
+                //    else
+                //    {
+                //        break;
+                //    }
+                //}
+                //while (res == kvp.Value.Length);
+
+                //res = myDeviceConnection.BulkTransfer(epOut, kvp.Value, kvp.Value.Length, 10000);
+                //if (res != kvp.Value.Length)
+                //{
+                //    return false;
+                //}
+
+                int bytesWritten;
+                ec = Writer.Write(kvp.Value, 10000, out bytesWritten);
+                if (ec != ErrorCode.None)
+                {
+                    err = (int)PrintError.SendFailure;
+                    return false;
+                }
+                else if (bytesWritten != kvp.Value.Length)
+                {
+                    err = (int)PrintError.SendFailure;
+                    return false;
+                }
+            }
+            return true;
         }
         /// <summary>
         ///切纸

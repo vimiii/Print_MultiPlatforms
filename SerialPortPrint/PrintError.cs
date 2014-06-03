@@ -42,6 +42,10 @@ namespace PrintBase
         /// 图片命令转换异常
         /// </summary>
         PosCMDErr=8,
+        /// <summary>
+        /// 重置打印机失败
+        /// </summary>
+        ResetFailure=9,
 
 
         /// <summary>

@@ -12,9 +12,10 @@ namespace PreventLostCenter.Tactics
     /// </summary>
     public class PrinterPrintingASB : PreventLostSuper
     {
-        public override void Handling()
+        public override PrinterState Handling()
         {
             Debug.WriteLine("打印机正在打印");
+            return PrinterState.PrinterPrinting;
         }
     }
 }

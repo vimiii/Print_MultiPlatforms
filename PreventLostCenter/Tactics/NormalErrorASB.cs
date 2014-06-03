@@ -12,9 +12,10 @@ namespace PreventLostCenter.Tactics
     /// </summary>
     public class NormalErrorASB : PreventLostSuper
     {
-        public override void Handling()
+        public override PrinterState Handling()
         {
             Debug.WriteLine("打印机有可恢复异常");
+            return PrinterState.NormalError;
         }
     }
 }

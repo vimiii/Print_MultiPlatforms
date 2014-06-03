@@ -12,9 +12,10 @@ namespace PreventLostCenter.Tactics
     /// </summary>
     class PrintOverASB:PreventLostSuper
     {
-        public override void Handling()
+        public override PrinterState Handling()
         {
             Debug.WriteLine("一次打印结束");
+            return PrinterState.PrintOver;
         }
     }
 }
