@@ -1,0 +1,15 @@
+﻿<Window x:Class="OposTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:wf="clr-namespace:AxOposPOSPrinter_CCO;assembly=AxInterop.OposPOSPrinter_CCO"  
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <WindowsFormsHost Name="wfh" Width="2" Height="2">
+            <wf:AxOPOSPOSPrinter x:Name="oposPrinter">
+
+            </wf:AxOPOSPOSPrinter>
+        </WindowsFormsHost>
+        <Button Content="Button" Click="Button_Click" HorizontalAlignment="Left" Margin="128,258,0,0" VerticalAlignment="Top" Width="75"/>
+
+    </Grid>
+</Window>
