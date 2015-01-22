@@ -403,8 +403,8 @@ namespace USBPrint.droid
             }
             int len = command.Length;
 
-            //分批发送
-            int packageLength = 5000;
+            //分批发送2
+            int packageLength = 1024;
             Dictionary<int, byte[]> data = new System.Collections.Generic.Dictionary<int, byte[]>();
             int num = len / packageLength + 1;
             for (int i = 0; i < num; i++)

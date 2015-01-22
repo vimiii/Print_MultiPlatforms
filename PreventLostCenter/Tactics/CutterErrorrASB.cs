@@ -12,9 +12,9 @@ namespace PreventLostCenter.Tactics
     /// </summary>
     class CutterErrorrASB : PreventLostSuper
     {
-        public override PrinterState Handling()
+        public override PrinterState Handling(string IP)
         {
-            Debug.WriteLine("切刀错误");
+            Debug.WriteLine(IP+"切刀错误");
             return PrinterState.CutterErrorr;
         }
     }

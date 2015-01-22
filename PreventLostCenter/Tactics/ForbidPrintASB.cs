@@ -12,9 +12,9 @@ namespace PreventLostCenter.Tactics
     /// </summary>
     public class ForbidPrintASB : PreventLostSuper
     {
-        public override PrinterState Handling()
+        public override PrinterState Handling(string IP)
         {
-            Debug.WriteLine("打印机禁止打印");
+            Debug.WriteLine(IP+"打印机禁止打印");
             return PrinterState.ForbidPrint;
         }
     }

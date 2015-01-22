@@ -298,7 +298,7 @@ namespace NetworkPrint.Win
                 byte[] data = new byte[cout];
                 Array.Copy(buffer, 0, data, 0, data.Length);
                 PreventLostContext context = new PreventLostContext(data);
-                PrinterState printerstate = context.Tactic();
+                PrinterState printerstate = context.Tactic(ip);
                 if (PrintExecCallBack != null)
                 {
                     PrintExecCallBack((int)printerstate);

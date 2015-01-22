@@ -15,11 +15,11 @@ namespace PreventLostCenter
         {
             super = PreventLostFactary.HandlerFactory(asb);
         }
-        public PrinterState Tactic()
+        public PrinterState Tactic(string IP)
         { 
             if(super!=null)
             {
-                return super.Handling();
+                return super.Handling(IP);
             }
             Debug.WriteLine("没有处理该打印机状态");
             return PrinterState.UnCatchPrinter;

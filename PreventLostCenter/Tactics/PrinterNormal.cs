@@ -12,9 +12,9 @@ namespace PreventLostCenter.Tactics
     /// </summary>
     public class PrinterNormal:PreventLostSuper
     {
-        public override PrinterState Handling()
+        public override PrinterState Handling(string IP)
         {
-            Debug.WriteLine("打印机正常");
+            Debug.WriteLine(IP+"打印机正常");
             return PrinterState.PrinterNormal;
         }
     }

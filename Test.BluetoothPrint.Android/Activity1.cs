@@ -11,17 +11,23 @@ using Android.Bluetooth;
 using Android.Graphics;
 using Java.IO;
 using BluetoothPrint.droid;
+using Android.Util;
 
 namespace Test.BluetoothPrint.droid
 {
     [Activity(Label = "Test", MainLauncher = true, Icon = "@drawable/icon")]
     public class Activity1 : Activity
     {
-        string address = "00:02:0A:01:60:71";
+        string address = "6C:EC:EB:50:9B:F7";//"98:D3:31:30:2A:3C";//"00:02:0A:01:60:71";
         BluetoothHelper blueH = null;
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
+
+            DisplayMetrics metric = new DisplayMetrics();
+            this.Window.WindowManager.DefaultDisplay.GetMetrics(metric);
+            float density = metric.Density;  // 屏幕密度（0.75 / 1.0 / 1.5）
+            //Rate = (float)metric.WidthPixels / (float)1280;
 
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.Main);
@@ -44,7 +50,7 @@ namespace Test.BluetoothPrint.droid
 
             if (blueH.Init(ConnectedAction, ConnectingAction, ConnFailedAction)==1)
             {
-                //蓝牙不存在
+                //蓝牙已打开
             }
             else
             {
@@ -67,9 +73,9 @@ namespace Test.BluetoothPrint.droid
             Button Print = FindViewById<Button>(Resource.Id.Print);
             Print.Click += (o, e) =>
             {
-                Java.Lang.String str = new Java.Lang.String("hello");
+                Java.Lang.String str = new Java.Lang.String("hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111hello111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
 
-                if (blueH.IsConnected()==1)
+                if (blueH.IsConnected()!=1)
                 {
                     if (blueH.Connect(address)==1)
                     {
@@ -78,11 +84,14 @@ namespace Test.BluetoothPrint.droid
                 }
                 else
                 {
-                    blueH.SendMessage(str);
+                    //blueH.SendMessage(str);
+                    Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("android.png"));
+                    blueH.SendImg(bm,576,0);
+                    blueH.WalkPaper(2);
+                    blueH.CutPage();
                 }
 
-                //Bitmap bm = BitmapFactory.DecodeStream(Resources.Assets.Open("android.png"));
-                //blueH.SendImg(bm,out err);
+                
             };
         }
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)

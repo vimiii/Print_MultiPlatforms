@@ -8,6 +8,6 @@ namespace PreventLostCenter
 {
     public abstract class PreventLostSuper
     {
-        public abstract PrinterState Handling();
+        public abstract PrinterState Handling(string IP);
     }
 }

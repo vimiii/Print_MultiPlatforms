@@ -12,9 +12,9 @@ namespace PreventLostCenter.Tactics
     /// </summary>
     public class TaskUnfinishedASB : PreventLostSuper
     {
-        public override PrinterState Handling()
+        public override PrinterState Handling(string IP)
         {
-            Debug.WriteLine("打印机正常任务未完成");
+            Debug.WriteLine(IP+"打印机正常任务未完成");
             return PrinterState.TaskUnfinished;
         }
     }

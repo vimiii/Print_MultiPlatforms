@@ -15,4 +15,6 @@
 		</activity>
 	</application>
 	<uses-permission android:name="android.permission.HARDWARE_TEST" />
+	<uses-permission android:name="android.permission.WRITE_SETTINGS" />
+	<uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
 </manifest>

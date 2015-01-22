@@ -68,6 +68,9 @@ namespace Test.USBPrint.droid
 			// aapt resource value: 0x7f070002
 			public const int MyButton = 2131165186;
 			
+			// aapt resource value: 0x7f070003
+			public const int btngps = 2131165187;
+			
 			// aapt resource value: 0x7f070001
 			public const int pid = 2131165185;
 			

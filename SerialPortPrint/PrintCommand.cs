@@ -49,7 +49,7 @@ namespace SerialPortPrint
         {
             byte[] cmdData = new byte[2];
 
-            //切纸
+            //换行
             cmdData[0] = 0x0d;
             cmdData[1] = 0x0a;
             return cmdData;

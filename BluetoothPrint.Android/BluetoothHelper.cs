@@ -81,6 +81,7 @@ namespace BluetoothPrint.droid
             else
             {
                 chatService = new BluetoothService(new MyHandler(this, ConnectedAction, ConnectingAction, ConnFailedAction));
+                isopen = true;
                 err = 1;
                 return err;
             }
@@ -158,6 +159,7 @@ namespace BluetoothPrint.droid
             }
             BluetoothDevice device = bluetoothAdapter.GetRemoteDevice(address);
             chatService.Connect(device);
+            isopen = true;
             err = 1;
             return err;
         }
@@ -243,6 +245,7 @@ namespace BluetoothPrint.droid
                     cmdData[6 + i] = data[i];
                 }
                 chatService.Write(data);
+                //chatService.Write(cmdData);
                 err = 1;
                 return err;
             }

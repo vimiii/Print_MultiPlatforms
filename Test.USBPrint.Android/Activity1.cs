@@ -14,6 +14,7 @@ using Android.Util;
 using System.Text;
 using USBPrint.droid;
 using Android.Graphics;
+using Android.Provider;
 
 namespace Test.USBPrint.droid
 {
@@ -32,6 +33,7 @@ namespace Test.USBPrint.droid
         EditText vid;
         EditText pid;
 
+        Activity ctx;
 
         List<int> productList = new List<int>();
 
@@ -45,6 +47,8 @@ namespace Test.USBPrint.droid
             // Get our button from the layout resource,
             // and attach an event to it
             Button button = FindViewById<Button>(Resource.Id.MyButton);
+
+            Button btngps = FindViewById<Button>(Resource.Id.btngps);
 
             helper = new PrintHelper();
             int err = 0;
@@ -85,6 +89,48 @@ namespace Test.USBPrint.droid
                     Log.Debug("print", res.ToString());
                 }
             };
+            //gps控制
+            btngps.Click += (o, e) =>
+            {
+                //toggleGPS();
+                turnGPSOn();
+            };
+
+            ctx = this;
+        }
+
+        private void toggleGPS()
+        {
+            Intent gpsIntent = new Intent();
+            gpsIntent.SetClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+            gpsIntent.AddCategory("android.intent.category.ALTERNATIVE");
+            gpsIntent.SetData(Android.Net.Uri.Parse("custom:3"));
+            try
+            {
+                PendingIntent.GetBroadcast(this, 0, gpsIntent, 0).Send();
+            }
+            catch (Android.App.PendingIntent.CanceledException e)
+            {
+                e.PrintStackTrace();
+            }
+        }
+
+        public void turnGPSOn()
+        {
+            Intent intent = new Intent("android.location.GPS_ENABLED_CHANGE");
+            intent.PutExtra("enabled", true);
+
+            this.ctx.SendBroadcast(intent);
+
+            String provider = Settings.Secure.GetString(ctx.ContentResolver, Settings.Secure.LocationProvidersAllowed);
+            //if (!provider.Contains("gps"))
+            //{ //if gps is disabled  
+                Intent poke = new Intent();
+                poke.SetClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+                poke.AddCategory(Intent.CategoryAlternative);
+                poke.SetData(Android.Net.Uri.Parse("3"));
+                this.ctx.SendBroadcast(poke);
+            //}
         }
 
         public class MyBroadcastReceiver : BroadcastReceiver

@@ -12,9 +12,9 @@ namespace PreventLostCenter.Tactics
     /// </summary>
     public class PrinterOffLineASB : PreventLostSuper
     {
-        public override PrinterState Handling()
+        public override PrinterState Handling(string IP)
         {
-            Debug.WriteLine("打印机离线");
+            Debug.WriteLine(IP+"打印机离线");
             return PrinterState.PrinterOffLine;
         }
     }

@@ -28,4 +28,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="打印" />
+    <Button
+        android:id="@+id/btngps"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="打开或关闭gps" />
 </LinearLayout>
